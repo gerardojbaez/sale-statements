@@ -20,18 +20,18 @@
     },
     "autoload": {
         "psr-4": {
-            "Gerardojbaez\\SaleStatement\\": "src/"
+            "Gerardojbaez\\SaleStatements\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Gerardojbaez\\SaleStatement\\Tests\\": "tests/"
+            "Gerardojbaez\\SaleStatements\\Tests\\": "tests/"
         }
     },
     "extra": {
         "laravel": {
             "providers": [
-                "Gerardojbaez\\SaleStatement\\SaleStatementServiceProvider"
+                "Gerardojbaez\\SaleStatements\\SaleStatementsServiceProvider"
             ]
         }
     }
