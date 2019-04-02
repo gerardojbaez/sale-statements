@@ -28,6 +28,7 @@ class SaleStatementsServiceProvider extends ServiceProvider
     public function register()
     {
         $this->registerDefaultConfigurations();
+        $this->registerCommands();
     }
 
     /**
@@ -40,5 +41,17 @@ class SaleStatementsServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(
             __DIR__.'/../config/sale-statements.php', 'sale-statements'
         );
+    }
+
+    /**
+     * Register the Affiliate Artisan commands.
+     *
+     * @return void
+     */
+    protected function registerCommands()
+    {
+        $this->commands([
+            Console\InsertSaleStatementTypesCommand::class,
+        ]);
     }
 }
