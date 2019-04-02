@@ -2,6 +2,7 @@
 
 namespace Gerardojbaez\SaleStatements\Tests\Feature;
 
+use Illuminate\Support\Facades\DB;
 use Gerardojbaez\SaleStatements\Replicate;
 use Gerardojbaez\SaleStatements\Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -318,5 +319,13 @@ class SaleStatementManagementTest extends TestCase
             'sale_statement_item_id' => $items->first()->id,
             'sale_statement_tax_id' => $taxes->first()->id,
         ]);
+
+        $statement = $statement->find($statement->id);
+
+        $this->assertEquals(34700, $statement->subtotal);
+        $this->assertEquals(3434, $statement->total_tax);
+        $this->assertEquals(667, $statement->discount_per_item);
+        $this->assertEquals(36134, $statement->total);
+        $this->assertEquals(3, $statement->items_count);
     }
 }

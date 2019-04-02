@@ -4,6 +4,7 @@ namespace Gerardojbaez\SaleStatements\Models;
 
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
+use Gerardojbaez\SaleStatements\Scopes\SaleStatementTotals;
 
 class SaleStatement extends Model
 {
@@ -11,6 +12,18 @@ class SaleStatement extends Model
     protected $fillable = [
         'discounts', 'type',
     ];
+
+    /**
+     * The "booting" method of the model.
+     *
+     * @return void
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::addGlobalScope(new SaleStatementTotals);
+    }
 
     /**
      * Create a sale statement.
@@ -85,13 +98,14 @@ class SaleStatement extends Model
     }
 
     /**
-     * Dynamically call the subtype relation of the sale statement.
+     * Dynamically call the subtype relation of the sale statement. If no
+     * type is defined, "quote" is used.
      *
      * @return mixed
      */
     public function subtype()
     {
-        $method = Str::camel($this->type);
+        $method = Str::camel($this->type ?: 'quote');
 
         return $this->$method();
     }
