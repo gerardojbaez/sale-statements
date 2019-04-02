@@ -246,7 +246,8 @@ class SaleStatementManagementTest extends TestCase
             ]
         ]);
 
-        $items->first()->taxes()->attach($taxes->first()); // item-specific taxes
+        // Taxes must be associated with items, otherwise they won't be applied.
+        $items->first()->taxes()->attach($taxes->first());
 
         return [$statement, $items, $taxes];
     }
