@@ -39,3 +39,11 @@ If performance is an issue for you, you may consider caching the sale statements
 ## A note on money values
 
 All amounts are represented in the smallest unit (e.g., cents), so USD 5.00 is written as `500`. For this reason, all database columns that store monetary values are using the INT data type.
+
+## Security
+
+If you discover any security related issues, please email g@gerardobaez.com instead of using the issue tracker.
+
+## License
+
+The MIT License (MIT). Please see License File for more information.
