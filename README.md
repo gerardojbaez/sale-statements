@@ -1,4 +1,4 @@
-# Sales Statements
+# Sales Statements :moneybag: :page_with_curl: :grin:
 
 A payment-agnostic sales records system for your Laravel application. 
 
@@ -24,7 +24,7 @@ You may consider using [Dompdf](https://github.com/dompdf/dompdf) and [Sparksuit
 
 ## A note on the database design
 
-You will notice that there are no quote, order, invoice or credit memo database tables. Since these documents share the same information and structure, the database was designed in such a way that all sale statements share the same database tables. 
+You will notice that there are no quote, order, invoice or credit memo database tables. Since these documents share the same information and structure, the database was designed in such a way that all sale statements share the same tables. 
 
 We are using the supertype/subtype approach. All the shared information between all sale statements are stored in `sale_statements` table. Sale statement specific information, like associating an invoice to an order statement is made on the `sale_statement_{subtype}` table; where "subtype" is the type of document (e.g., `sale_statement_invoice` for invoice type statements). 
 
