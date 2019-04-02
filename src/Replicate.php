@@ -110,7 +110,7 @@ class Replicate
             $itemToTaxMap = [];
 
             $statement->items->transform(function ($item) use ($statement, &$itemToTaxMap) {
-                $new = $item->replicate();
+                $new = $item->replicate(['amount']);
                 $new->sale_statement_id = $statement->id;
                 $new->save();
 

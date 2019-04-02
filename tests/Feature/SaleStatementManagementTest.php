@@ -327,5 +327,11 @@ class SaleStatementManagementTest extends TestCase
         $this->assertEquals(667, $statement->discount_per_item);
         $this->assertEquals(36134, $statement->total);
         $this->assertEquals(3, $statement->items_count);
+
+        foreach ($items as $item) {
+            $item = $item->find($item->id);
+
+            $this->assertEquals($item->price * $item->quantity, $item->amount);
+        }
     }
 }
