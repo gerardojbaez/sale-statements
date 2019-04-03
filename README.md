@@ -40,10 +40,14 @@ If performance is an issue for you, you may consider caching the sale statements
 
 All amounts are represented in the smallest unit (e.g., cents), so USD 5.00 is written as `500`. For this reason, all database columns that store monetary values are using the INT data type.
 
+## I don't see the relation to my users or products table
+
+There's no assumption of your billable and product models. If you need to add a relation or extend the base functionality, you are free to do so by altering the tables as needed and extending the default models.
+
 ## Security
 
-If you discover any security related issues, please email g@gerardobaez.com instead of using the issue tracker.
+If you discover any security-related issue, please email g@gerardobaez.com instead of using the issue tracker.
 
 ## License
 
-The MIT License (MIT). Please see License File for more information.
+Released under the MIT License. Please see License file included for more information.
