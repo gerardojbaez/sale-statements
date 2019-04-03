@@ -50,4 +50,4 @@ If you discover any security-related issue, please email g@gerardobaez.com inste
 
 ## License
 
-Released under the MIT License. Please see License file included for more information.
+Released under the MIT License. Please see the License file included for more information.
