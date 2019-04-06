@@ -18,17 +18,17 @@ class SaleStatement extends Model
      *
      * @param  string  $type  The type of sales statement to create.
      * @param  array  $statement  The sale statement's fillable attributes.
-     * @param  array  $quote  The quote's fillable attributes.
+     * @param  array  $subtype  The subtype's fillable attributes.
      * @return \Gerardojbaez\SaleStatements\Models\SaleStatement
      */
-    public static function create(string $type, array $statement = [], array $quote = [])
+    public static function create(string $type, array $statement = [], array $subtype = [])
     {
         $instance = new static;
         $instance->fill(array_merge($statement, compact('type')))->save();
 
         $method = Str::camel($type);
 
-        $instance->$method()->create($quote);
+        $instance->$method()->create($subtype);
 
         return $instance;
     }
