@@ -18,6 +18,7 @@ class CreateSaleStatementTaxesTable extends Migration
             $table->integer('sale_statement_id')->unsigned();
             $table->string('name', 25);
             $table->decimal('rate', 6, 6)->unsigned();
+            $table->integer('amount');
 
             $table->foreign('sale_statement_id')
                 ->references('id')
