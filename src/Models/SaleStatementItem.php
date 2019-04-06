@@ -19,18 +19,6 @@ class SaleStatementItem extends Model
     protected $touches = ['statement'];
 
     /**
-     * The "booting" method of the model.
-     *
-     * @return void
-     */
-    protected static function boot()
-    {
-        parent::boot();
-
-        static::addGlobalScope(new SaleStatementItemTotals);
-    }
-
-    /**
      * Get the statement of the item.
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo

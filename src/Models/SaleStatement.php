@@ -14,18 +14,6 @@ class SaleStatement extends Model
     ];
 
     /**
-     * The "booting" method of the model.
-     *
-     * @return void
-     */
-    protected static function boot()
-    {
-        parent::boot();
-
-        static::addGlobalScope(new SaleStatementTotals);
-    }
-
-    /**
      * Create a sale statement.
      *
      * @param  string  $type  The type of sales statement to create.
