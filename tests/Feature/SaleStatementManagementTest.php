@@ -241,13 +241,16 @@ class SaleStatementManagementTest extends TestCase
         $discounts = $statement->discounts()->createMany([
             [
                 'name' => 'Get 20% off of license!',
-                'discount' => 5960,
+                'discount' => 20,
+                'is_percentage' => true,
             ], [
                 'name' => '$5 off of professional installation!',
                 'discount' => 500,
+                'is_percentage' => false,
             ], [
                 'name' => '$5 off of everything!',
                 'discount' => 500,
+                'is_percentage' => false,
             ]
         ]);
 
@@ -314,18 +317,21 @@ class SaleStatementManagementTest extends TestCase
         $this->assertDatabaseHas('sale_statement_discounts', [
             'sale_statement_id' => $statement->id,
             'name' => 'Get 20% off of license!',
-            'discount' => 5960
+            'is_percentage' => true,
+            'discount' => 20
         ]);
 
         $this->assertDatabaseHas('sale_statement_discounts', [
             'sale_statement_id' => $statement->id,
             'name' => '$5 off of professional installation!',
+            'is_percentage' => false,
             'discount' => 500
         ]);
 
         $this->assertDatabaseHas('sale_statement_discounts', [
             'sale_statement_id' => $statement->id,
             'name' => '$5 off of everything!',
+            'is_percentage' => false,
             'discount' => 500
         ]);
 
@@ -382,13 +388,13 @@ class SaleStatementManagementTest extends TestCase
         $calculator = new Calculator($statement);
 
         $this->assertEquals(34700, $calculator->getSubtotal());
-        $this->assertEquals(6960, $calculator->getTotalDiscount());
+        $this->assertEquals(6794, $calculator->getTotalDiscount());
         $this->assertEquals(500, $calculator->getTotalGlobalDiscount());
         $this->assertEquals(167, $calculator->getGlobalDiscountPerItem());
-        $this->assertEquals(27740, $calculator->getSubtotalAfterDiscount());
+        $this->assertEquals(27906, $calculator->getSubtotalAfterDiscount());
         $this->assertEquals(2998, $calculator->getTotalTax());
         $this->assertEquals(275, $calculator->getTotalGlobalTax());
         $this->assertEquals(92, $calculator->getGlobalTaxPerItem());
-        $this->assertEquals(30738, $calculator->getTotal());
+        $this->assertEquals(30904, $calculator->getTotal());
     }
 }

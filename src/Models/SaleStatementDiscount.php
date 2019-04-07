@@ -8,7 +8,7 @@ class SaleStatementDiscount extends Model
 {
     /** @inheritDoc */
     protected $fillable = [
-        'name', 'discount',
+        'name', 'discount', 'is_percentage'
     ];
 
     /** @inheritDoc */

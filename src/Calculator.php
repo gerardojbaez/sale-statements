@@ -32,7 +32,13 @@ class Calculator
      */
     public function getItemsCount()
     {
-        return $this->statement->items->sum('quantity');
+        $qty = 0;
+
+        foreach ($this->statement->items as $item) {
+            $qty += $item->quantity;
+        }
+
+        return $qty;
     }
 
     /**
@@ -60,11 +66,11 @@ class Calculator
     {
         $amount = 0;
 
-        foreach ($this->statement->discounts as $discount) {
-            $amount += $discount->discount;
+        foreach ($this->statement->items as $item) {
+            $amount += $this->getTotalDiscountsForItem($item);
         }
 
-        return $amount;
+        return (int) round($amount);
     }
 
     /**
@@ -76,9 +82,16 @@ class Calculator
     public function getTotalGlobalDiscount()
     {
         $amount = 0;
+        $subtotal = $this->getSubtotal();
 
         foreach ($this->statement->discounts as $discount) {
-            if ($discount->items->count() === 0) {
+            if ($discount->items->sum('quantity') > 0) {
+                continue;
+            }
+
+            if ($discount->is_percentage) {
+                $amount += $subtotal * $discount->discount / 100;
+            } else {
                 $amount += $discount->discount;
             }
         }
@@ -179,7 +192,11 @@ class Calculator
         $amount = $this->getGlobalDiscountPerItem();
 
         foreach ($item->discounts as $discount) {
-            $amount += $discount->discount / $discount->items->sum('quantity');
+            if ($discount->is_percentage) {
+                $amount += $item->price * $item->quantity * $discount->discount / 100;
+            } else {
+                $amount += $discount->discount / $discount->items->sum('quantity');
+            }
         }
 
         return $amount;

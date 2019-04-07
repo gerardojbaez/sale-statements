@@ -17,6 +17,7 @@ class CreateSaleStatementDiscountsTable extends Migration
             $table->increments('id');
             $table->integer('sale_statement_id')->unsigned();
             $table->string('name', 50);
+            $table->boolean('is_percentage')->default(0);
             $table->integer('discount');
 
             $table->foreign('sale_statement_id')
