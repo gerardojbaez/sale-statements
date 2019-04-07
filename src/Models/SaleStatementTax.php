@@ -8,7 +8,7 @@ class SaleStatementTax extends Model
 {
     /** @inheritDoc */
     protected $fillable = [
-        'name', 'rate',
+        'name', 'rate', 'amount',
     ];
 
     /** @inheritDoc */

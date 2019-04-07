@@ -16,7 +16,6 @@ class CreateSaleStatementsTable extends Migration
         Schema::create('sale_statements', function (Blueprint $table) {
             $table->increments('id');
             $table->string('type', 15);
-            $table->integer('discounts')->unsigned()->default(0);
             $table->timestamps();
 
             $table->foreign('type')

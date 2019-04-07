@@ -4,6 +4,7 @@ namespace Gerardojbaez\SaleStatements\Tests\Feature;
 
 use Illuminate\Support\Facades\DB;
 use Gerardojbaez\SaleStatements\Replicate;
+use Gerardojbaez\SaleStatements\Calculator;
 use Gerardojbaez\SaleStatements\Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Gerardojbaez\SaleStatements\Models\SaleStatement;
@@ -27,10 +28,10 @@ class SaleStatementManagementTest extends TestCase
         ]);
 
         // Act
-        list($statement, $items, $taxes) = $this->createSaleStatement('quote');
+        list($statement, $items, $taxes, $discounts) = $this->createSaleStatement('quote');
 
         // Assert
-        $this->assertSaleStatementWasCreated($statement,  $items, $taxes, 'quote');
+        $this->assertSaleStatementWasCreated($statement,  $items, $taxes, 'quote', $discounts);
     }
 
     /**
@@ -47,10 +48,10 @@ class SaleStatementManagementTest extends TestCase
         ]);
 
         // Act
-        list($statement, $items, $taxes) = $this->createSaleStatement('order');
+        list($statement, $items, $taxes, $discounts) = $this->createSaleStatement('order');
 
         // Assert
-        $this->assertSaleStatementWasCreated($statement, $items, $taxes, 'order');
+        $this->assertSaleStatementWasCreated($statement, $items, $taxes, 'order', $discounts);
     }
 
     /**
@@ -67,7 +68,7 @@ class SaleStatementManagementTest extends TestCase
         ]);
 
         // Act
-        list($statement, $items, $taxes) = $this->createSaleStatement('invoice');
+        list($statement, $items, $taxes, $discounts) = $this->createSaleStatement('invoice');
 
         $payment = $statement->invoice->payments()->create([
             'amount_applied' => 5000
@@ -78,7 +79,7 @@ class SaleStatementManagementTest extends TestCase
         ]);
 
         // Assert
-        $this->assertSaleStatementWasCreated($statement, $items, $taxes, 'invoice');
+        $this->assertSaleStatementWasCreated($statement, $items, $taxes, 'invoice', $discounts);
 
         $this->assertDatabaseHas('sale_statement_invoice_payments', [
             'sale_statement_invoice_id' => $statement->invoice->id,
@@ -107,10 +108,10 @@ class SaleStatementManagementTest extends TestCase
         ]);
 
         // Act
-        list($statement, $items, $taxes) = $this->createSaleStatement('credit_memo');
+        list($statement, $items, $taxes, $discounts) = $this->createSaleStatement('credit_memo');
 
         // Assert
-        $this->assertSaleStatementWasCreated($statement, $items, $taxes, 'credit_memo');
+        $this->assertSaleStatementWasCreated($statement, $items, $taxes, 'credit_memo', $discounts);
     }
 
     /**
@@ -131,7 +132,7 @@ class SaleStatementManagementTest extends TestCase
             'name' => 'Order',
         ]);
 
-        list($quote, $quoteItems, $quoteTaxes) = $this->createSaleStatement('quote');
+        list($quote, $quoteItems, $quoteTaxes, $quoteDiscounts) = $this->createSaleStatement('quote');
 
         // Act
         $order = (new Replicate($quote))->asOrder();
@@ -142,12 +143,13 @@ class SaleStatementManagementTest extends TestCase
 
         $orderItems = $order->items()->get();
         $orderTaxes = $order->taxes()->get();
+        $orderDiscounts = $order->discounts()->get();
 
         $this->assertCount(2, $orderItems);
-        $this->assertCount(2, $orderTaxes);
+        $this->assertCount(3, $orderTaxes);
 
-        $this->assertSaleStatementWasCreated($quote, $quoteItems, $quoteTaxes, 'quote');
-        $this->assertSaleStatementWasCreated($order, $orderItems, $orderTaxes, 'order');
+        $this->assertSaleStatementWasCreated($quote, $quoteItems, $quoteTaxes, 'quote', $quoteDiscounts);
+        $this->assertSaleStatementWasCreated($order, $orderItems, $orderTaxes, 'order', $orderDiscounts);
 
         $this->assertDatabaseHas('sale_statement_order', [
             'sale_statement_id' => $order->id,
@@ -173,7 +175,7 @@ class SaleStatementManagementTest extends TestCase
             'name' => 'Invoice',
         ]);
 
-        list($order, $orderItems, $orderTaxes) = $this->createSaleStatement('order');
+        list($order, $orderItems, $orderTaxes, $orderDiscounts) = $this->createSaleStatement('order');
 
         // Act
         $invoice = (new Replicate($order))->asInvoice();
@@ -184,12 +186,13 @@ class SaleStatementManagementTest extends TestCase
 
         $invoiceItems = $invoice->items()->get();
         $invoiceTaxes = $invoice->taxes()->get();
+        $invoiceDiscounts = $invoice->discounts()->get();
 
         $this->assertCount(2, $invoiceItems);
-        $this->assertCount(2, $invoiceTaxes);
+        $this->assertCount(3, $invoiceTaxes);
 
-        $this->assertSaleStatementWasCreated($order, $orderItems, $orderTaxes, 'order');
-        $this->assertSaleStatementWasCreated($invoice, $invoiceItems, $invoiceTaxes, 'invoice');
+        $this->assertSaleStatementWasCreated($order, $orderItems, $orderTaxes, 'order', $orderDiscounts);
+        $this->assertSaleStatementWasCreated($invoice, $invoiceItems, $invoiceTaxes, 'invoice', $invoiceDiscounts);
 
         $this->assertDatabaseHas('sale_statement_invoice', [
             'sale_statement_id' => $invoice->id,
@@ -205,9 +208,7 @@ class SaleStatementManagementTest extends TestCase
      */
     protected function createSaleStatement($type)
     {
-        $statement = SaleStatement::create($type, [
-            'discounts' => 2000,
-        ]);
+        $statement = SaleStatement::create($type);
 
         $statement->addresses()->create([
             'is_shipping' => true,
@@ -231,26 +232,48 @@ class SaleStatementManagementTest extends TestCase
                 'price' => 14900,
                 'quantity' => 2,
             ], [
-                'name' => 'Professional installation',
+                'name' => 'Professional installation (global tax only should be applied here)',
                 'price' => 4900,
                 'quantity' => 1,
             ]
         ]);
 
+        $discounts = $statement->discounts()->createMany([
+            [
+                'name' => 'Get 20% off of license!',
+                'discount' => 5960,
+            ], [
+                'name' => '$5 off of professional installation!',
+                'discount' => 500,
+            ], [
+                'name' => '$5 off of everything!',
+                'discount' => 500,
+            ]
+        ]);
+
+        $items->first()->discounts()->attach($discounts->first());
+        $items->last()->discounts()->attach($discounts->last());
+
         $taxes = $statement->taxes()->createMany([
             [
                 'name' => 'PR State',
                 'rate' => 0.105,
+                'amount' => 2486
             ], [
                 'name' => 'PR Mun (Juana Díaz)',
                 'rate' => 0.01,
+                'amount' => 237
+            ], [
+                'name' => 'Global tax example',
+                'rate' => 0.01,
+                'amount' => 275
             ]
         ]);
 
-        // Taxes must be associated with items, otherwise they won't be applied.
-        $items->first()->taxes()->attach($taxes->first());
+        $items->first()->taxes()->attach($taxes[0]);
+        $items->first()->taxes()->attach($taxes[1]);
 
-        return [$statement, $items, $taxes];
+        return [$statement, $items, $taxes, $discounts];
     }
 
     /**
@@ -260,12 +283,11 @@ class SaleStatementManagementTest extends TestCase
      * @param string $type
      * @return void
      */
-    protected function assertSaleStatementWasCreated($statement, $items, $taxes, $type)
+    protected function assertSaleStatementWasCreated($statement, $items, $taxes, $type, $discounts)
     {
         $this->assertDatabaseHas('sale_statements', [
             'id' => $statement->id,
             'type' => $type,
-            'discounts' => 2000,
         ]);
 
         $this->assertDatabaseHas("sale_statement_{$type}", [
@@ -289,6 +311,34 @@ class SaleStatementManagementTest extends TestCase
             'organization' => 'Acme Co.',
         ]);
 
+        $this->assertDatabaseHas('sale_statement_discounts', [
+            'sale_statement_id' => $statement->id,
+            'name' => 'Get 20% off of license!',
+            'discount' => 5960
+        ]);
+
+        $this->assertDatabaseHas('sale_statement_discounts', [
+            'sale_statement_id' => $statement->id,
+            'name' => '$5 off of professional installation!',
+            'discount' => 500
+        ]);
+
+        $this->assertDatabaseHas('sale_statement_discounts', [
+            'sale_statement_id' => $statement->id,
+            'name' => '$5 off of everything!',
+            'discount' => 500
+        ]);
+
+        $this->assertDatabaseHas('sale_statement_discount_item', [
+            'sale_statement_discount_id' => $discounts->first()->id,
+            'sale_statement_item_id' => $items->first()->id,
+        ]);
+
+        $this->assertDatabaseHas('sale_statement_discount_item', [
+            'sale_statement_discount_id' => $discounts->last()->id,
+            'sale_statement_item_id' => $items->last()->id,
+        ]);
+
         $this->assertDatabaseHas('sale_statement_items', [
             'sale_statement_id' => $statement->id,
             'name' => 'Software license',
@@ -298,7 +348,7 @@ class SaleStatementManagementTest extends TestCase
 
         $this->assertDatabaseHas('sale_statement_items', [
             'sale_statement_id' => $statement->id,
-            'name' => 'Professional installation',
+            'name' => 'Professional installation (global tax only should be applied here)',
             'price' => 4900,
             'quantity' => 1,
         ]);
@@ -307,12 +357,21 @@ class SaleStatementManagementTest extends TestCase
             'sale_statement_id' => $statement->id,
             'name' => 'PR State',
             'rate' => 0.105,
+            'amount' => 2486
         ]);
 
         $this->assertDatabaseHas('sale_statement_taxes', [
             'sale_statement_id' => $statement->id,
             'name' => 'PR Mun (Juana Díaz)',
             'rate' => 0.01,
+            'amount' => 237
+        ]);
+
+        $this->assertDatabaseHas('sale_statement_taxes', [
+            'sale_statement_id' => $statement->id,
+            'name' => 'Global tax example',
+            'rate' => 0.01,
+            'amount' => 275
         ]);
 
         $this->assertDatabaseHas('sale_statement_item_tax', [
@@ -320,18 +379,16 @@ class SaleStatementManagementTest extends TestCase
             'sale_statement_tax_id' => $taxes->first()->id,
         ]);
 
-        $statement = $statement->find($statement->id);
+        $calculator = new Calculator($statement);
 
-        $this->assertEquals(34700, $statement->subtotal);
-        $this->assertEquals(3434, $statement->total_tax);
-        $this->assertEquals(667, $statement->discount_per_item);
-        $this->assertEquals(36134, $statement->total);
-        $this->assertEquals(3, $statement->items_count);
-
-        foreach ($items as $item) {
-            $item = $item->find($item->id);
-
-            $this->assertEquals($item->price * $item->quantity, $item->amount);
-        }
+        $this->assertEquals(34700, $calculator->getSubtotal());
+        $this->assertEquals(6960, $calculator->getTotalDiscount());
+        $this->assertEquals(500, $calculator->getTotalGlobalDiscount());
+        $this->assertEquals(167, $calculator->getGlobalDiscountPerItem());
+        $this->assertEquals(27740, $calculator->getSubtotalAfterDiscount());
+        $this->assertEquals(2998, $calculator->getTotalTax());
+        $this->assertEquals(275, $calculator->getTotalGlobalTax());
+        $this->assertEquals(92, $calculator->getGlobalTaxPerItem());
+        $this->assertEquals(30738, $calculator->getTotal());
     }
 }

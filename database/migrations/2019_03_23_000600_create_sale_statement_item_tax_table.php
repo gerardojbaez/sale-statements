@@ -16,7 +16,6 @@ class CreateSaleStatementItemTaxTable extends Migration
         Schema::create('sale_statement_item_tax', function (Blueprint $table) {
             $table->integer('sale_statement_item_id')->unsigned();
             $table->integer('sale_statement_tax_id')->unsigned();
-            $table->integer('amount');
 
             $table->primary(['sale_statement_item_id', 'sale_statement_tax_id'], 'sale_statement_item_id_tax_id');
 

@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateSaleStatementItemsTable extends Migration
+class CreateSaleStatementDiscountsTable extends Migration
 {
     /**
      * Run the migration.
@@ -13,12 +13,11 @@ class CreateSaleStatementItemsTable extends Migration
      */
     public function up()
     {
-        Schema::create('sale_statement_items', function (Blueprint $table) {
+        Schema::create('sale_statement_discounts', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('sale_statement_id')->unsigned();
-            $table->string('name');
-            $table->integer('price');
-            $table->smallInteger('quantity')->unsigned();
+            $table->string('name', 50);
+            $table->integer('discount');
 
             $table->foreign('sale_statement_id')
                 ->references('id')
@@ -34,6 +33,6 @@ class CreateSaleStatementItemsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('sale_statement_items');
+        Schema::dropIfExists('sale_statement_discounts');
     }
 }

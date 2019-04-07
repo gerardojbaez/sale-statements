@@ -30,12 +30,6 @@ We are using the supertype/subtype approach. All the shared information between 
 
 Items, addresses, and taxes are associated with the supertype (i.e., `sale_statements` table). Invoices payments are associated with the subtype `sale_statement_invoice`. 
 
-## A note on normalization/denormalization of totals
-
-You will notice that there is no denormalization for the sale statement calculation and totals. That's because it's better to calculate on-the-fly. The `Gerardojbaez\SaleStatements\Models\SaleStatement` and `Gerardojbaez\SaleStatements\Models\SaleStatementInvoice` models have Eloquent's global scopes that automatically computes the totals, so you don't have to do it yourself. 
-
-If performance is an issue for you, you may consider caching the sale statements. You may also apply the denormalization yourself as needed. 
-
 ## A note on money values
 
 All amounts are represented in the smallest unit (e.g., cents), so USD 5.00 is written as `500`. For this reason, all database columns that store monetary values are using the INT data type.

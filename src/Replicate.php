@@ -89,7 +89,14 @@ class Replicate
     protected function replicateAs($type)
     {
         return DB::transaction(function () use ($type) {
-            $statement = $this->statement->load('items.taxes', 'taxes', 'addresses')->replicate();
+            $statement = $this->statement->load(
+                'items.taxes',
+                'items.discounts',
+                'taxes',
+                'discounts',
+                'addresses'
+            )->replicate();
+
             $statement->type = $type;
             $statement->save();
 
@@ -108,14 +115,19 @@ class Replicate
             });
 
             $itemToTaxMap = [];
+            $itemToDiscountMap = [];
 
-            $statement->items->transform(function ($item) use ($statement, &$itemToTaxMap) {
+            $statement->items->transform(function ($item) use ($statement, &$itemToTaxMap, &$itemToDiscountMap) {
                 $new = $item->replicate(['amount']);
                 $new->sale_statement_id = $statement->id;
                 $new->save();
 
                 foreach ($item->taxes as $tax) {
                     $itemToTaxMap[$tax->id][] = $new->id;
+                }
+
+                foreach ($item->discounts as $discount) {
+                    $itemToDiscountMap[$discount->id][] = $new->id;
                 }
 
                 return $new;
@@ -128,6 +140,18 @@ class Replicate
 
                 if (isset($itemToTaxMap[$tax->id])) {
                     $new->items()->attach($itemToTaxMap[$tax->id]);
+                }
+
+                return $new;
+            });
+
+            $statement->discounts->transform(function ($discount) use ($statement, $itemToDiscountMap) {
+                $new = $discount->replicate();
+                $new->sale_statement_id = $statement->id;
+                $new->save();
+
+                if (isset($itemToDiscountMap[$discount->id])) {
+                    $new->items()->attach($itemToDiscountMap[$discount->id]);
                 }
 
                 return $new;

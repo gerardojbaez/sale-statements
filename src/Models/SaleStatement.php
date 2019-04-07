@@ -159,6 +159,16 @@ class SaleStatement extends Model
     }
 
     /**
+     * Get the discounts of the model.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function discounts()
+    {
+        return $this->hasMany(config('sale-statements.models.sale_statement_discount'));
+    }
+
+    /**
      * Get the taxes of the model.
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany

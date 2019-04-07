@@ -12,6 +12,7 @@ return [
         'sale_statement_invoice' => \Gerardojbaez\SaleStatements\Models\SaleStatementInvoice::class,
         'sale_statement_invoice_payment' => \Gerardojbaez\SaleStatements\Models\SaleStatementInvoicePayment::class,
         'sale_statement_item' => \Gerardojbaez\SaleStatements\Models\SaleStatementItem::class,
+        'sale_statement_discount' => \Gerardojbaez\SaleStatements\Models\SaleStatementDiscount::class,
         'sale_statement_order' => \Gerardojbaez\SaleStatements\Models\SaleStatementOrder::class,
         'sale_statement_quote' => \Gerardojbaez\SaleStatements\Models\SaleStatementQuote::class,
         'sale_statement_tax' => \Gerardojbaez\SaleStatements\Models\SaleStatementTax::class,

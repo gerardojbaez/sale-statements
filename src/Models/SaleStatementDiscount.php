@@ -3,13 +3,12 @@
 namespace Gerardojbaez\SaleStatements\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Gerardojbaez\SaleStatements\Scopes\SaleStatementItemTotals;
 
-class SaleStatementItem extends Model
+class SaleStatementDiscount extends Model
 {
     /** @inheritDoc */
     protected $fillable = [
-        'name', 'price', 'quantity',
+        'name', 'discount',
     ];
 
     /** @inheritDoc */
@@ -32,28 +31,15 @@ class SaleStatementItem extends Model
     }
 
     /**
-     * Get the discounts of the model.
+     * Get the items of the model.
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function discounts()
+    public function items()
     {
         return $this->belongsToMany(
-            config('sale-statements.models.sale_statement_discount'),
+            config('sale-statements.models.sale_statement_item'),
             'sale_statement_discount_item'
-        );
-    }
-
-    /**
-     * Get the taxes of the model.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function taxes()
-    {
-        return $this->belongsToMany(
-            config('sale-statements.models.sale_statement_tax'),
-            'sale_statement_item_tax'
         );
     }
 }
