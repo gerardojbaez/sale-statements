@@ -197,7 +197,7 @@ class Calculator
         $amount = $this->getGlobalTaxPerItem();
 
         foreach ($item->taxes as $tax) {
-            $amount += $tax->amount / $discount->items->sum('quantity');
+            $amount += $tax->amount / $tax->items->sum('quantity');
         }
 
         return $amount;
