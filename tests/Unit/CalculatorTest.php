@@ -371,6 +371,16 @@ class CalculatorTest extends TestCase
         $discountItemCollection = Mockery::mock(Collection::class);
         $discountItemCollection->shouldReceive('sum')->with('quantity')->andReturn(3);
 
+        $globalDiscounts = collect([
+            Mockery::mock(SaleStatementDiscount::class, function ($mock) use ($discountItemCollection) {
+                $mock->shouldReceive('getAttribute')->with('is_percentage')->andReturn(true);
+                $mock->shouldReceive('getAttribute')->with('discount')->andReturn(20);
+                $mock->shouldReceive('getAttribute')->with('items')->andReturn(collect([
+                    ['quantity' => 0]
+                ]));
+            }),
+        ]);
+
         $discounts = collect([
             Mockery::mock(SaleStatementDiscount::class, function ($mock) use ($discountItemCollection) {
                 $mock->shouldReceive('getAttribute')->with('is_percentage')->andReturn(true);
@@ -406,7 +416,7 @@ class CalculatorTest extends TestCase
         ]);
 
         $statement = Mockery::mock(SaleStatement::class);
-        $statement->shouldReceive('getAttribute')->with('discounts')->andReturn($discounts);
+        $statement->shouldReceive('getAttribute')->with('discounts')->andReturn($discounts->merge($globalDiscounts));
         $statement->shouldReceive('getAttribute')->with('items')->andReturn($items);
 
         $calculator = new Calculator($statement);
@@ -415,7 +425,7 @@ class CalculatorTest extends TestCase
         $result = $calculator->getTotalDiscountsForItem($items[0]);
 
         // Assert
-        $this->assertSame(90, $result);
+        $this->assertSame(136, $result);
     }
 
     public function testTotalTaxForItem()
@@ -429,6 +439,7 @@ class CalculatorTest extends TestCase
 
         $item = Mockery::mock(SaleStatementItem::class);
         $item->shouldReceive('getAttribute')->with('taxes')->andReturn($taxes);
+        $item->shouldReceive('getAttribute')->with('quantity')->andReturn(2);
 
         $statement = Mockery::mock(SaleStatement::class);
         $statement->shouldReceive('getAttribute')->with('taxes')->andReturn($globalTaxes + $taxes);
@@ -440,7 +451,7 @@ class CalculatorTest extends TestCase
         $result = $calculator->getTotalTaxForItem($item);
 
         // Assert
-        $this->assertSame(168, $result);
+        $this->assertSame(211, $result);
     }
 
     protected function mockItems()

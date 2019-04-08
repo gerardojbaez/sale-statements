@@ -183,7 +183,7 @@ class Calculator
      */
     public function getTotalDiscountsForItem(SaleStatementItem $item)
     {
-        $amount = $this->getGlobalDiscountPerItem();
+        $amount = $this->getGlobalDiscountPerItem() * $item->quantity;
 
         foreach ($item->discounts as $discount) {
             if ($discount->is_percentage) {
@@ -205,7 +205,7 @@ class Calculator
      */
     public function getTotalTaxForItem(SaleStatementItem $item)
     {
-        $amount = $this->getGlobalTaxPerItem();
+        $amount = $this->getGlobalTaxPerItem() * $item->quantity;
 
         foreach ($item->taxes as $tax) {
             $amount += $tax->amount / $tax->items->sum('quantity');
