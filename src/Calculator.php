@@ -32,13 +32,7 @@ class Calculator
      */
     public function getItemsCount()
     {
-        $qty = 0;
-
-        foreach ($this->statement->items as $item) {
-            $qty += $item->quantity;
-        }
-
-        return $qty;
+        return $this->statement->items->sum('quantity');
     }
 
     /**
