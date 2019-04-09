@@ -22,7 +22,6 @@ class CreateSaleStatementAddressesTable extends Migration
             $table->string('line_2', 75)->nullable();
             $table->string('locality', 45)->nullable(); // City, Town, Municipality, etc...
             $table->string('administrative_area', 45)->nullable(); // State, Province, Region, etc...
-            $table->string('country', 45);
             $table->string('country_code', 3);
             $table->string('postalcode', 25)->nullable();
             $table->string('given_name', 45)->nullable(); // i.e., first name
