@@ -215,14 +215,14 @@ class SaleStatementManagementTest extends TestCase
             'is_billing' => true,
             'line_1' => '711-2880 Nulla St',
             'line_2' => 'second line...',
-            'city' => 'Mankato',
-            'province' => 'Mississipi',
+            'locality' => 'Mankato', // City, Town, Municipality, etc...
+            'administrative_area' => 'Mississipi', // State, Province, Region, etc...
             'country' => 'United States',
-            'zip' => 96522,
-            'first_name' => 'Cecilia',
-            'last_name' => 'Chapman',
-            'province_code' => 'MS',
             'country_code' => 'US',
+            'postalcode' => 96522,
+            'given_name' => 'Cecilia', // i.e., first name
+            'additional_name' => 'J.', // Can be used to hold a middle name, or a patronymic.
+            'family_name' => 'Chapman', // i.e., last name
             'organization' => 'Acme Co.',
         ]);
 
@@ -303,14 +303,14 @@ class SaleStatementManagementTest extends TestCase
             'is_billing' => true,
             'line_1' => '711-2880 Nulla St',
             'line_2' => 'second line...',
-            'city' => 'Mankato',
-            'province' => 'Mississipi',
+            'locality' => 'Mankato',
+            'administrative_area' => 'Mississipi',
             'country' => 'United States',
-            'zip' => 96522,
-            'first_name' => 'Cecilia',
-            'last_name' => 'Chapman',
-            'province_code' => 'MS',
             'country_code' => 'US',
+            'postalcode' => 96522,
+            'given_name' => 'Cecilia',
+            'additional_name' => 'J.',
+            'family_name' => 'Chapman',
             'organization' => 'Acme Co.',
         ]);
 
@@ -388,7 +388,7 @@ class SaleStatementManagementTest extends TestCase
         $calculator = new Calculator($statement);
 
         $this->assertEquals(34700, $calculator->getSubtotal());
-        $this->assertEquals(6794, $calculator->getTotalDiscount());
+        $this->assertEquals(6961, $calculator->getTotalDiscount());
         $this->assertEquals(500, $calculator->getTotalGlobalDiscount());
         $this->assertEquals(167, $calculator->getGlobalDiscountPerItem());
         $this->assertEquals(27906, $calculator->getSubtotalAfterDiscount());

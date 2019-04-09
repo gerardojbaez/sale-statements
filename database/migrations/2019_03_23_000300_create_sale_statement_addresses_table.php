@@ -19,16 +19,16 @@ class CreateSaleStatementAddressesTable extends Migration
             $table->boolean('is_shipping');
             $table->boolean('is_billing');
             $table->string('line_1', 75);
-            $table->string('line_2', 75);
-            $table->string('city', 45);
-            $table->string('province', 45);
+            $table->string('line_2', 75)->nullable();
+            $table->string('locality', 45)->nullable(); // City, Town, Municipality, etc...
+            $table->string('administrative_area', 45)->nullable(); // State, Province, Region, etc...
             $table->string('country', 45);
-            $table->string('zip', 25);
-            $table->string('first_name', 45);
-            $table->string('last_name', 45);
-            $table->string('province_code', 5);
             $table->string('country_code', 3);
-            $table->string('organization', 45);
+            $table->string('postalcode', 25)->nullable();
+            $table->string('given_name', 45)->nullable(); // i.e., first name
+            $table->string('additional_name', 45)->nullable(); // Can be used to hold a middle name, or a patronymic.
+            $table->string('family_name', 45)->nullable(); // i.e., last name
+            $table->string('organization', 45)->nullable();
 
             $table->foreign('sale_statement_id')
                 ->references('id')
