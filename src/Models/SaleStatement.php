@@ -105,7 +105,7 @@ class SaleStatement extends Model
      */
     public function quote()
     {
-        return $this->hasOne(config('sale-statements.models.sale_statement_quote'));
+        return $this->hasOne(config('sale-statements.models.sale_statement_quote'), 'id');
     }
 
     /**
@@ -115,7 +115,7 @@ class SaleStatement extends Model
      */
     public function order()
     {
-        return $this->hasOne(config('sale-statements.models.sale_statement_order'));
+        return $this->hasOne(config('sale-statements.models.sale_statement_order'), 'id');
     }
 
     /**
@@ -125,7 +125,7 @@ class SaleStatement extends Model
      */
     public function creditMemo()
     {
-        return $this->hasOne(config('sale-statements.models.sale_statement_creditmemo'));
+        return $this->hasOne(config('sale-statements.models.sale_statement_creditmemo'), 'id');
     }
 
     /**
@@ -135,7 +135,7 @@ class SaleStatement extends Model
      */
     public function invoice()
     {
-        return $this->hasOne(config('sale-statements.models.sale_statement_invoice'));
+        return $this->hasOne(config('sale-statements.models.sale_statement_invoice'), 'id');
     }
 
     /**

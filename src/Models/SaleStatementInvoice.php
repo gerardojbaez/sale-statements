@@ -10,6 +10,9 @@ class SaleStatementInvoice extends Model
     protected $table = 'sale_statement_invoice';
 
     /** @inheritDoc */
+    public $incrementing = false;
+
+    /** @inheritDoc */
     protected $fillable = [];
 
     /** @inheritDoc */
@@ -27,7 +30,7 @@ class SaleStatementInvoice extends Model
     {
         return $this->belongsTo(
             config('sale-statements.models.sale_statement'),
-            'sale_statement_id'
+            'id'
         );
     }
 

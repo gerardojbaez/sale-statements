@@ -10,6 +10,9 @@ class SaleStatementQuote extends Model
     protected $table = 'sale_statement_quote';
 
     /** @inheritDoc */
+    public $incrementing = false;
+
+    /** @inheritDoc */
     protected $fillable = [];
 
     /** @inheritDoc */
@@ -27,7 +30,7 @@ class SaleStatementQuote extends Model
     {
         return $this->belongsTo(
             config('sale-statements.models.sale_statement'),
-            'sale_statement_id'
+            'id'
         );
     }
 }

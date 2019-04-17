@@ -152,7 +152,7 @@ class SaleStatementManagementTest extends TestCase
         $this->assertSaleStatementWasCreated($order, $orderItems, $orderTaxes, 'order', $orderDiscounts);
 
         $this->assertDatabaseHas('sale_statement_order', [
-            'sale_statement_id' => $order->id,
+            'id' => $order->id,
             'sale_statement_quote_id' => $quote->id,
         ]);
     }
@@ -195,7 +195,7 @@ class SaleStatementManagementTest extends TestCase
         $this->assertSaleStatementWasCreated($invoice, $invoiceItems, $invoiceTaxes, 'invoice', $invoiceDiscounts);
 
         $this->assertDatabaseHas('sale_statement_invoice', [
-            'sale_statement_id' => $invoice->id,
+            'id' => $invoice->id,
             'sale_statement_order_id' => $order->id,
         ]);
     }
@@ -293,7 +293,7 @@ class SaleStatementManagementTest extends TestCase
         ]);
 
         $this->assertDatabaseHas("sale_statement_{$type}", [
-            'sale_statement_id' => $statement->id,
+            'id' => $statement->id,
         ]);
 
         $this->assertDatabaseHas('sale_statement_addresses', [

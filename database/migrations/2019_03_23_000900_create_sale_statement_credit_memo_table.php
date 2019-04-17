@@ -14,10 +14,9 @@ class CreateSaleStatementCreditMemoTable extends Migration
     public function up()
     {
         Schema::create('sale_statement_credit_memo', function (Blueprint $table) {
-            $table->increments('id');
-            $table->integer('sale_statement_id')->unsigned();
+            $table->integer('id')->unsigned();
 
-            $table->foreign('sale_statement_id')
+            $table->foreign('id')
                 ->references('id')
                 ->on('sale_statements')
                 ->onDelete('cascade');
