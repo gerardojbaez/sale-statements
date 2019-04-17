@@ -389,10 +389,10 @@ class SaleStatementManagementTest extends TestCase
         $this->assertEquals(6961, $calculator->getTotalDiscount());
         $this->assertEquals(500, $calculator->getTotalGlobalDiscount());
         $this->assertEquals(167, $calculator->getGlobalDiscountPerItem());
-        $this->assertEquals(27906, $calculator->getSubtotalAfterDiscount());
+        $this->assertEquals(27739, $calculator->getSubtotalAfterDiscount());
         $this->assertEquals(2998, $calculator->getTotalTax());
         $this->assertEquals(275, $calculator->getTotalGlobalTax());
         $this->assertEquals(92, $calculator->getGlobalTaxPerItem());
-        $this->assertEquals(30904, $calculator->getTotal());
+        $this->assertEquals(30737, $calculator->getTotal());
     }
 }
