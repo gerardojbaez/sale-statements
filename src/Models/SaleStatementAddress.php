@@ -15,7 +15,6 @@ class SaleStatementAddress extends Model
         'administrative_area',
         'locality',
         'dependent_locality',
-        'country',
         'country_code',
         'postalcode',
         'given_name',

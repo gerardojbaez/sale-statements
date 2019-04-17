@@ -217,7 +217,6 @@ class SaleStatementManagementTest extends TestCase
             'line_2' => 'second line...',
             'locality' => 'Mankato', // City, Town, Municipality, etc...
             'administrative_area' => 'Mississipi', // State, Province, Region, etc...
-            'country' => 'United States',
             'country_code' => 'US',
             'postalcode' => 96522,
             'given_name' => 'Cecilia', // i.e., first name
@@ -305,7 +304,6 @@ class SaleStatementManagementTest extends TestCase
             'line_2' => 'second line...',
             'locality' => 'Mankato',
             'administrative_area' => 'Mississipi',
-            'country' => 'United States',
             'country_code' => 'US',
             'postalcode' => 96522,
             'given_name' => 'Cecilia',
