@@ -35,6 +35,19 @@ class SaleStatementInvoice extends Model
     }
 
     /**
+     * Get the order of the invoice.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function order()
+    {
+        return $this->belongsTo(
+            config('sale-statements.models.sale_statement_order'),
+            'sale_statement_order_id'
+        );
+    }
+
+    /**
      * Get the payments of the invoice.
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany

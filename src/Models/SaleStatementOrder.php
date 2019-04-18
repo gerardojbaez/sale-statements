@@ -33,4 +33,17 @@ class SaleStatementOrder extends Model
             'id'
         );
     }
+
+    /**
+     * Get the quote of the order.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function quote()
+    {
+        return $this->belongsTo(
+            config('sale-statements.models.sale_statement_quote'),
+            'sale_statement_quote_id'
+        );
+    }
 }
