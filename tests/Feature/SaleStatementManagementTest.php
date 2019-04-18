@@ -78,6 +78,8 @@ class SaleStatementManagementTest extends TestCase
             'amount_applied' => 10000
         ]);
 
+        $calculator = new Calculator($statement);
+
         // Assert
         $this->assertSaleStatementWasCreated($statement, $items, $taxes, 'invoice', $discounts);
 
@@ -92,6 +94,11 @@ class SaleStatementManagementTest extends TestCase
         ]);
 
         $this->assertEquals($statement->invoice->id, $payment->invoice->id);
+        $this->assertSame(15000, $calculator->getTotalPaid());
+        $this->assertSame(15737, $calculator->getBalance());
+        $this->assertTrue($calculator->needsPayment());
+        $this->assertFalse($calculator->isPaid());
+        $this->assertTrue($calculator->isPartiallyPaid());
     }
 
     /**

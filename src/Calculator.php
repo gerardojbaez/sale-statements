@@ -213,4 +213,73 @@ class Calculator
 
         return $amount;
     }
+
+    /**
+     * Get the sum of all payments applied to the sale statement.
+     *
+     * @todo Add unit tests.
+     * @return int
+     */
+    public function getTotalPaid()
+    {
+        if ($this->statement->isInvoice()) {
+            $invoice = $this->statement;
+        } elseif ($this->statement->isOrder()) {
+            $invoice = $this->statement->invoice;
+        } elseif ($this->statement->isQuote()) {
+            $invoice = $this->statement->order->invoice;
+        }
+
+        if (! $invoice) {
+            return 0;
+        }
+
+        return $invoice->invoice->payments->sum('amount_applied');
+    }
+
+    /**
+     * Get the remaining balance to be paid.
+     *
+     * @todo Add unit tests.
+     * @return int
+     */
+    public function getBalance()
+    {
+        return $this->getTotal() - $this->getTotalPaid();
+    }
+
+    /**
+     * Determines whether the sale statement needs payment.
+     *
+     * @todo Add unit tests.
+     * @return int
+     */
+    public function needsPayment()
+    {
+        return $this->getBalance() > 0;
+    }
+
+    /**
+     * Determines whether the sale statement has a zero balance.
+     *
+     * @todo Add unit tests.
+     * @return boolean
+     */
+    public function isPaid()
+    {
+        return $this->getBalance() === 0;
+    }
+
+    /**
+     * Determines whether the sale statement has partial payments.
+     *
+     * @todo Add unit tests.
+     * @return boolean
+     */
+    public function isPartiallyPaid()
+    {
+        $totalPaid = $this->getTotalPaid();
+
+        return $totalPaid > 0 and $totalPaid < $this->getTotal();
+    }
 }
