@@ -59,4 +59,17 @@ class SaleStatementInvoice extends Model
             'sale_statement_invoice_id'
         );
     }
+
+    /**
+     * Get the credit memos of the order.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function creditMemos()
+    {
+        return $this->hasMany(
+            config('sale-statements.models.sale_statement_credit_memo'),
+            'sale_statement_invoice_id'
+        );
+    }
 }

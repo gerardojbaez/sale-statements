@@ -46,4 +46,17 @@ class SaleStatementOrder extends Model
             'sale_statement_quote_id'
         );
     }
+
+    /**
+     * Get the invoices of the order.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function invoices()
+    {
+        return $this->hasMany(
+            config('sale-statements.models.sale_statement_invoice'),
+            'sale_statement_order_id'
+        );
+    }
 }
