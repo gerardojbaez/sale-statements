@@ -10,31 +10,15 @@ use Gerardojbaez\SaleStatements\Models\SaleStatement;
 class Replicate
 {
     /**
-     * The sale statement to be replicated.
-     *
-     * @var \Gerardojbaez\SaleStatements\Models\SaleStatement
-     */
-    protected $statement;
-
-    /**
-     * Create a new sale statement replication instance.
-     *
-     * @param \Gerardojbaez\SaleStatements\Models\SaleStatement $statement
-     */
-    public function __construct(SaleStatement $statement)
-    {
-        $this->statement = $statement;
-    }
-
-    /**
      * Generate a new order statement from quote.
      *
      * @todo  Reduce N+1 query issue.
+     * @param \Gerardojbaez\SaleStatements\Models\SaleStatement $statement
      * @return \Gerardojbaez\SaleStatements\Models\SaleStatement
      */
-    public function asOrder()
+    public function asOrder(SaleStatement $statement)
     {
-        if (! $this->statement->isQuote()) {
+        if (! $statement->isQuote()) {
             throw new Exception('Only quote type sale statement can be replicated as order.');
         }
 
@@ -46,7 +30,7 @@ class Replicate
 
         $saleStatementOrderClass::unguard();
 
-        $statement = $this->replicateAs($saleStatementTypeClass::TYPE_ORDER);
+        $statement = $this->replicateAs($saleStatementTypeClass::TYPE_ORDER, $statement);
 
         $saleStatementOrderClass::reguard();
 
@@ -57,11 +41,12 @@ class Replicate
      * Generate a new invoice statement from order.
      *
      * @todo  Reduce N+1 query issue.
+     * @param \Gerardojbaez\SaleStatements\Models\SaleStatement $statement
      * @return \Gerardojbaez\SaleStatements\Models\SaleStatement
      */
-    public function asInvoice()
+    public function asInvoice(SaleStatement $statement)
     {
-        if (! $this->statement->isOrder()) {
+        if (! $statement->isOrder()) {
             throw new Exception('Only order type sale statement can be replicated as invoice.');
         }
 
@@ -73,7 +58,7 @@ class Replicate
 
         $saleStatementInvoiceClass::unguard();
 
-        $statement = $this->replicateAs($saleStatementTypeClass::TYPE_INVOICE);
+        $statement = $this->replicateAs($saleStatementTypeClass::TYPE_INVOICE, $statement);
 
         $saleStatementInvoiceClass::reguard();
 
@@ -84,12 +69,13 @@ class Replicate
      * Replicate sale statement.
      *
      * @param string $type
+     * @param \Gerardojbaez\SaleStatements\Models\SaleStatement $original
      * @return \Gerardojbaez\SaleStatements\Models\SaleStatement
      */
-    protected function replicateAs($type)
+    protected function replicateAs($type, $original)
     {
-        return DB::transaction(function () use ($type) {
-            $statement = $this->statement->load(
+        return DB::transaction(function () use ($type, $original) {
+            $statement = $original->load(
                 'items.taxes',
                 'items.discounts',
                 'taxes',
@@ -103,7 +89,7 @@ class Replicate
             $method = Str::camel($type);
 
             $statement->$method()->create([
-                $this->statement->subtype->getForeignKey() => $this->statement->id
+                $original->subtype->getForeignKey() => $original->id
             ]);
 
             $statement->addresses->transform(function ($address) use ($statement) {

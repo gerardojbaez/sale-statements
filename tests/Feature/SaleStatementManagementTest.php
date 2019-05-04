@@ -142,7 +142,7 @@ class SaleStatementManagementTest extends TestCase
         list($quote, $quoteItems, $quoteTaxes, $quoteDiscounts) = $this->createSaleStatement('quote');
 
         // Act
-        $order = (new Replicate($quote))->asOrder();
+        $order = (new Replicate)->asOrder($quote);
 
         // Assert
         $this->assertInstanceOf(SaleStatement::class, $order);
@@ -188,7 +188,7 @@ class SaleStatementManagementTest extends TestCase
         list($order, $orderItems, $orderTaxes, $orderDiscounts) = $this->createSaleStatement('order');
 
         // Act
-        $invoice = (new Replicate($order))->asInvoice();
+        $invoice = (new Replicate)->asInvoice($order);
 
         // Assert
         $this->assertInstanceOf(SaleStatement::class, $invoice);
