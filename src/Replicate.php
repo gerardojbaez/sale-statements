@@ -7,7 +7,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Gerardojbaez\SaleStatements\Models\SaleStatement;
 
-class Replicate
+class Replicate implements ReplicateInterface
 {
     /**
      * Generate a new order statement from quote.
