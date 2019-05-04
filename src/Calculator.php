@@ -6,7 +6,7 @@ use Exception;
 use Gerardojbaez\SaleStatements\Models\SaleStatement;
 use Gerardojbaez\SaleStatements\Models\SaleStatementItem;
 
-class Calculator
+class Calculator implements CalculatorInterface
 {
     /**
      * The sale statement being calculated.
@@ -252,7 +252,7 @@ class Calculator
      * Determines whether the sale statement needs payment.
      *
      * @todo Add unit tests.
-     * @return int
+     * @return boolean
      */
     public function needsPayment()
     {
