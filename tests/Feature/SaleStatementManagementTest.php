@@ -78,7 +78,7 @@ class SaleStatementManagementTest extends TestCase
             'amount_applied' => 10000
         ]);
 
-        $calculator = new Calculator($statement);
+        $calculator = new Calculator;
 
         // Assert
         $this->assertSaleStatementWasCreated($statement, $items, $taxes, 'invoice', $discounts);
@@ -94,11 +94,11 @@ class SaleStatementManagementTest extends TestCase
         ]);
 
         $this->assertEquals($statement->invoice->id, $payment->invoice->id);
-        $this->assertSame(15000, $calculator->getTotalPaid());
-        $this->assertSame(15737, $calculator->getBalance());
-        $this->assertTrue($calculator->needsPayment());
-        $this->assertFalse($calculator->isPaid());
-        $this->assertTrue($calculator->isPartiallyPaid());
+        $this->assertSame(15000, $calculator->getTotalPaid($statement));
+        $this->assertSame(15737, $calculator->getBalance($statement));
+        $this->assertTrue($calculator->needsPayment($statement));
+        $this->assertFalse($calculator->isPaid($statement));
+        $this->assertTrue($calculator->isPartiallyPaid($statement));
     }
 
     /**
@@ -396,16 +396,16 @@ class SaleStatementManagementTest extends TestCase
             'sale_statement_tax_id' => $taxes->first()->id,
         ]);
 
-        $calculator = new Calculator($statement);
+        $calculator = new Calculator;
 
-        $this->assertEquals(34700, $calculator->getSubtotal());
-        $this->assertEquals(6961, $calculator->getTotalDiscount());
-        $this->assertEquals(500, $calculator->getTotalGlobalDiscount());
-        $this->assertEquals(167, $calculator->getGlobalDiscountPerItem());
-        $this->assertEquals(27739, $calculator->getSubtotalAfterDiscount());
-        $this->assertEquals(2998, $calculator->getTotalTax());
-        $this->assertEquals(275, $calculator->getTotalGlobalTax());
-        $this->assertEquals(92, $calculator->getGlobalTaxPerItem());
-        $this->assertEquals(30737, $calculator->getTotal());
+        $this->assertEquals(34700, $calculator->getSubtotal($statement));
+        $this->assertEquals(6961, $calculator->getTotalDiscount($statement));
+        $this->assertEquals(500, $calculator->getTotalGlobalDiscount($statement));
+        $this->assertEquals(167, $calculator->getGlobalDiscountPerItem($statement));
+        $this->assertEquals(27739, $calculator->getSubtotalAfterDiscount($statement));
+        $this->assertEquals(2998, $calculator->getTotalTax($statement));
+        $this->assertEquals(275, $calculator->getTotalGlobalTax($statement));
+        $this->assertEquals(92, $calculator->getGlobalTaxPerItem($statement));
+        $this->assertEquals(30737, $calculator->getTotal($statement));
     }
 }

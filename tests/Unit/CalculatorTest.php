@@ -22,10 +22,10 @@ class CalculatorTest extends TestCase
         $statement = Mockery::mock(SaleStatement::class);
         $statement->shouldReceive('getAttribute')->with('items')->andReturn($collection);
 
-        $calculator = new Calculator($statement);
+        $calculator = new Calculator();
 
         // Act
-        $result = $calculator->getItemsCount();
+        $result = $calculator->getItemsCount($statement);
 
         // Assert
         $this->assertSame(3, $result);
@@ -39,10 +39,10 @@ class CalculatorTest extends TestCase
         $statement = Mockery::mock(SaleStatement::class);
         $statement->shouldReceive('getAttribute')->with('items')->andReturn($items);
 
-        $calculator = new Calculator($statement);
+        $calculator = new Calculator();
 
         // Act
-        $result = $calculator->getSubtotal();
+        $result = $calculator->getSubtotal($statement);
 
         // Assert
         $this->assertSame(350, $result);
@@ -68,34 +68,37 @@ class CalculatorTest extends TestCase
             })
         ]);
 
+        $statement = Mockery::mock(SaleStatement::class);
+
         $items = collect([
-            Mockery::mock(SaleStatementItem::class, function ($mock) use ($discounts) {
+            Mockery::mock(SaleStatementItem::class, function ($mock) use ($discounts, $statement) {
                 $mock->shouldReceive('offsetExists')->with('quantity')->andReturn(true);
                 $mock->shouldReceive('offsetGet')->with('quantity')->andReturn(2);
 
+                $mock->shouldReceive('getAttribute')->with('statement')->andReturn($statement);
                 $mock->shouldReceive('getAttribute')->with('discounts')->andReturn($discounts);
                 $mock->shouldReceive('getAttribute')->with('price')->andReturn(100);
                 $mock->shouldReceive('getAttribute')->with('quantity')->andReturn(2);
             }),
 
-            Mockery::mock(SaleStatementItem::class, function ($mock) use ($discounts) {
+            Mockery::mock(SaleStatementItem::class, function ($mock) use ($discounts, $statement) {
                 $mock->shouldReceive('offsetExists')->with('quantity')->andReturn(true);
                 $mock->shouldReceive('offsetGet')->with('quantity')->andReturn(1);
 
+                $mock->shouldReceive('getAttribute')->with('statement')->andReturn($statement);
                 $mock->shouldReceive('getAttribute')->with('discounts')->andReturn($discounts);
                 $mock->shouldReceive('getAttribute')->with('price')->andReturn(150);
                 $mock->shouldReceive('getAttribute')->with('quantity')->andReturn(1);
             })
         ]);
 
-        $statement = Mockery::mock(SaleStatement::class);
         $statement->shouldReceive('getAttribute')->with('items')->andReturn($items);
         $statement->shouldReceive('getAttribute')->with('discounts')->andReturn($discounts);
 
-        $calculator = new Calculator($statement);
+        $calculator = new Calculator();
 
         // Act
-        $result = $calculator->getTotalDiscount();
+        $result = $calculator->getTotalDiscount($statement);
 
         // Assert
         $this->assertSame(170, $result);
@@ -137,10 +140,10 @@ class CalculatorTest extends TestCase
         $statement->shouldReceive('getAttribute')->with('discounts')->andReturn($discounts);
         $statement->shouldReceive('getAttribute')->with('items')->andReturn($items);
 
-        $calculator = new Calculator($statement);
+        $calculator = new Calculator();
 
         // Act
-        $result = $calculator->getTotalGlobalDiscount();
+        $result = $calculator->getTotalGlobalDiscount($statement);
 
         // Assert
         $this->assertSame(220, $result);
@@ -188,10 +191,10 @@ class CalculatorTest extends TestCase
         $statement->shouldReceive('getAttribute')->with('discounts')->andReturn($discounts);
         $statement->shouldReceive('getAttribute')->with('items')->andReturn($items);
 
-        $calculator = new Calculator($statement);
+        $calculator = new Calculator();
 
         // Act
-        $result = $calculator->getGlobalDiscountPerItem();
+        $result = $calculator->getGlobalDiscountPerItem($statement);
 
         // Assert
         $this->assertSame(73, $result);
@@ -219,35 +222,38 @@ class CalculatorTest extends TestCase
             })
         ]);
 
+        $statement = Mockery::mock(SaleStatement::class);
+
         $items = collect([
-            Mockery::mock(SaleStatementItem::class, function ($mock) use ($discounts) {
+            Mockery::mock(SaleStatementItem::class, function ($mock) use ($discounts, $statement) {
                 $mock->shouldReceive('offsetExists')->with('quantity')->andReturn(true);
                 $mock->shouldReceive('offsetGet')->with('quantity')->andReturn(2);
 
+                $mock->shouldReceive('getAttribute')->with('statement')->andReturn($statement);
                 $mock->shouldReceive('getAttribute')->with('discounts')->andReturn($discounts);
                 $mock->shouldReceive('getAttribute')->with('price')->andReturn(100);
                 $mock->shouldReceive('getAttribute')->with('quantity')->andReturn(2);
             }),
 
-            Mockery::mock(SaleStatementItem::class, function ($mock) use ($discounts) {
+            Mockery::mock(SaleStatementItem::class, function ($mock) use ($discounts, $statement) {
                 $mock->shouldReceive('offsetExists')->with('quantity')->andReturn(true);
                 $mock->shouldReceive('offsetGet')->with('quantity')->andReturn(1);
 
+                $mock->shouldReceive('getAttribute')->with('statement')->andReturn($statement);
                 $mock->shouldReceive('getAttribute')->with('discounts')->andReturn($discounts);
                 $mock->shouldReceive('getAttribute')->with('price')->andReturn(150);
                 $mock->shouldReceive('getAttribute')->with('quantity')->andReturn(1);
             })
         ]);
 
-        $statement = Mockery::mock(SaleStatement::class);
         $statement->shouldReceive('getAttribute')->with('items')->andReturn($items);
         $statement->shouldReceive('getAttribute')->with('discounts')->andReturn($discounts);
 
-        $calculator = new Calculator($statement);
+        $calculator = new Calculator();
 
         // Act
-        $discountsLowerThanSubtotal = $calculator->getSubtotalAfterDiscount();
-        $discountsHigherThanSubtotal = $calculator->getSubtotalAfterDiscount();
+        $discountsLowerThanSubtotal = $calculator->getSubtotalAfterDiscount($statement);
+        $discountsHigherThanSubtotal = $calculator->getSubtotalAfterDiscount($statement);
 
         // Assert
         $this->assertSame(180, $discountsLowerThanSubtotal);
@@ -262,10 +268,10 @@ class CalculatorTest extends TestCase
         $statement = Mockery::mock(SaleStatement::class);
         $statement->shouldReceive('getAttribute')->with('taxes')->andReturn($taxes);
 
-        $calculator = new Calculator($statement);
+        $calculator = new Calculator();
 
         // Act
-        $result = $calculator->getTotalTax();
+        $result = $calculator->getTotalTax($statement);
 
         // Assert
         $this->assertSame(250, $result);
@@ -279,10 +285,10 @@ class CalculatorTest extends TestCase
         $statement = Mockery::mock(SaleStatement::class);
         $statement->shouldReceive('getAttribute')->with('taxes')->andReturn($taxes);
 
-        $calculator = new Calculator($statement);
+        $calculator = new Calculator();
 
         // Act
-        $result = $calculator->getTotalGlobalTax();
+        $result = $calculator->getTotalGlobalTax($statement);
 
         // Assert
         $this->assertSame(300, $result);
@@ -300,10 +306,10 @@ class CalculatorTest extends TestCase
         $statement->shouldReceive('getAttribute')->with('items')->andReturn($items);
         $statement->shouldReceive('getAttribute')->with('taxes')->andReturn($taxes);
 
-        $calculator = new Calculator($statement);
+        $calculator = new Calculator();
 
         // Act
-        $result = $calculator->getGlobalTaxPerItem();
+        $result = $calculator->getGlobalTaxPerItem($statement);
 
         // Assert
         $this->assertSame(43, $result);
@@ -329,20 +335,24 @@ class CalculatorTest extends TestCase
             })
         ]);
 
+        $statement = Mockery::mock(SaleStatement::class);
+
         $items = collect([
-            Mockery::mock(SaleStatementItem::class, function ($mock) use ($discounts) {
+            Mockery::mock(SaleStatementItem::class, function ($mock) use ($discounts, $statement) {
                 $mock->shouldReceive('offsetExists')->with('quantity')->andReturn(true);
                 $mock->shouldReceive('offsetGet')->with('quantity')->andReturn(2);
 
+                $mock->shouldReceive('getAttribute')->with('statement')->andReturn($statement);
                 $mock->shouldReceive('getAttribute')->with('discounts')->andReturn($discounts);
                 $mock->shouldReceive('getAttribute')->with('price')->andReturn(100);
                 $mock->shouldReceive('getAttribute')->with('quantity')->andReturn(2);
             }),
 
-            Mockery::mock(SaleStatementItem::class, function ($mock) use ($discounts) {
+            Mockery::mock(SaleStatementItem::class, function ($mock) use ($discounts, $statement) {
                 $mock->shouldReceive('offsetExists')->with('quantity')->andReturn(true);
                 $mock->shouldReceive('offsetGet')->with('quantity')->andReturn(1);
 
+                $mock->shouldReceive('getAttribute')->with('statement')->andReturn($statement);
                 $mock->shouldReceive('getAttribute')->with('discounts')->andReturn($discounts);
                 $mock->shouldReceive('getAttribute')->with('price')->andReturn(150);
                 $mock->shouldReceive('getAttribute')->with('quantity')->andReturn(1);
@@ -351,15 +361,14 @@ class CalculatorTest extends TestCase
 
         $taxes = $this->mockTaxes();
 
-        $statement = Mockery::mock(SaleStatement::class);
         $statement->shouldReceive('getAttribute')->with('items')->andReturn($items);
         $statement->shouldReceive('getAttribute')->with('discounts')->andReturn($discounts);
         $statement->shouldReceive('getAttribute')->with('taxes')->andReturn($taxes);
 
-        $calculator = new Calculator($statement);
+        $calculator = new Calculator();
 
         // Act
-        $result = $calculator->getTotal();
+        $result = $calculator->getTotal($statement);
 
         // Assert
         $this->assertSame(430, $result);
@@ -395,31 +404,34 @@ class CalculatorTest extends TestCase
             })
         ]);
 
+        $statement = Mockery::mock(SaleStatement::class);
+
         $items = collect([
-            Mockery::mock(SaleStatementItem::class, function ($mock) use ($discounts) {
+            Mockery::mock(SaleStatementItem::class, function ($mock) use ($discounts, $statement) {
                 $mock->shouldReceive('offsetExists')->with('quantity')->andReturn(true);
                 $mock->shouldReceive('offsetGet')->with('quantity')->andReturn(2);
 
+                $mock->shouldReceive('getAttribute')->with('statement')->andReturn($statement);
                 $mock->shouldReceive('getAttribute')->with('discounts')->andReturn($discounts);
                 $mock->shouldReceive('getAttribute')->with('price')->andReturn(100);
                 $mock->shouldReceive('getAttribute')->with('quantity')->andReturn(2);
             }),
 
-            Mockery::mock(SaleStatementItem::class, function ($mock) use ($discounts) {
+            Mockery::mock(SaleStatementItem::class, function ($mock) use ($discounts, $statement) {
                 $mock->shouldReceive('offsetExists')->with('quantity')->andReturn(true);
                 $mock->shouldReceive('offsetGet')->with('quantity')->andReturn(1);
 
+                $mock->shouldReceive('getAttribute')->with('statement')->andReturn($statement);
                 $mock->shouldReceive('getAttribute')->with('discounts')->andReturn($discounts);
                 $mock->shouldReceive('getAttribute')->with('price')->andReturn(150);
                 $mock->shouldReceive('getAttribute')->with('quantity')->andReturn(1);
             })
         ]);
 
-        $statement = Mockery::mock(SaleStatement::class);
         $statement->shouldReceive('getAttribute')->with('discounts')->andReturn($discounts->merge($globalDiscounts));
         $statement->shouldReceive('getAttribute')->with('items')->andReturn($items);
 
-        $calculator = new Calculator($statement);
+        $calculator = new Calculator();
 
         // Act
         $result = $calculator->getTotalDiscountsForItem($items[0]);
@@ -437,15 +449,17 @@ class CalculatorTest extends TestCase
         $items = Mockery::mock(Collection::class);
         $items->shouldReceive('sum')->with('quantity')->andReturn(7);
 
+        $statement = Mockery::mock(SaleStatement::class);
+
         $item = Mockery::mock(SaleStatementItem::class);
+        $item->shouldReceive('getAttribute')->with('statement')->andReturn($statement);
         $item->shouldReceive('getAttribute')->with('taxes')->andReturn($taxes);
         $item->shouldReceive('getAttribute')->with('quantity')->andReturn(2);
 
-        $statement = Mockery::mock(SaleStatement::class);
         $statement->shouldReceive('getAttribute')->with('taxes')->andReturn($globalTaxes + $taxes);
         $statement->shouldReceive('getAttribute')->with('items')->andReturn($items);
 
-        $calculator = new Calculator($statement);
+        $calculator = new Calculator();
 
         // Act
         $result = $calculator->getTotalTaxForItem($item);

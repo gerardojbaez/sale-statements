@@ -9,42 +9,27 @@ use Gerardojbaez\SaleStatements\Models\SaleStatementItem;
 class Calculator implements CalculatorInterface
 {
     /**
-     * The sale statement being calculated.
-     *
-     * @var \Gerardojbaez\SaleStatements\Models\SaleStatement
-     */
-    protected $statement;
-
-    /**
-     * Create a new calculator instance.
-     *
-     * @param \Gerardojbaez\SaleStatements\Models\SaleStatement $statement
-     */
-    public function __construct(SaleStatement $statement)
-    {
-        $this->statement = $statement;
-    }
-
-    /**
      * Get the sum of all item quantities.
      *
+     * @param \Gerardojbaez\SaleStatements\Models\SaleStatement $statement
      * @return int
      */
-    public function getItemsCount()
+    public function getItemsCount(SaleStatement $statement)
     {
-        return $this->statement->items->sum('quantity');
+        return $statement->items->sum('quantity');
     }
 
     /**
      * Get the sum of all item prices without any discount or tax applied.
      *
+     * @param \Gerardojbaez\SaleStatements\Models\SaleStatement $statement
      * @return int
      */
-    public function getSubtotal()
+    public function getSubtotal(SaleStatement $statement)
     {
         $subtotal = 0;
 
-        foreach ($this->statement->items as $item) {
+        foreach ($statement->items as $item) {
             $subtotal += $item->price * $item->quantity;
         }
 
@@ -54,13 +39,14 @@ class Calculator implements CalculatorInterface
     /**
      * Get the sum of all discounts applied.
      *
+     * @param \Gerardojbaez\SaleStatements\Models\SaleStatement $statement
      * @return int
      */
-    public function getTotalDiscount()
+    public function getTotalDiscount(SaleStatement $statement)
     {
         $amount = 0;
 
-        foreach ($this->statement->items as $item) {
+        foreach ($statement->items as $item) {
             $amount += $this->getTotalDiscountsForItem($item);
         }
 
@@ -71,14 +57,15 @@ class Calculator implements CalculatorInterface
      * Get the sum of all global discounts (i.e., not associated to any
      * line item).
      *
+     * @param \Gerardojbaez\SaleStatements\Models\SaleStatement $statement
      * @return int
      */
-    public function getTotalGlobalDiscount()
+    public function getTotalGlobalDiscount(SaleStatement $statement)
     {
         $amount = 0;
-        $subtotal = $this->getSubtotal();
+        $subtotal = $this->getSubtotal($statement);
 
-        foreach ($this->statement->discounts as $discount) {
+        foreach ($statement->discounts as $discount) {
             if ($discount->items->sum('quantity') > 0) {
                 continue;
             }
@@ -96,21 +83,23 @@ class Calculator implements CalculatorInterface
     /**
      * Get global discount per item.
      *
+     * @param \Gerardojbaez\SaleStatements\Models\SaleStatement $statement
      * @return int
      */
-    public function getGlobalDiscountPerItem()
+    public function getGlobalDiscountPerItem(SaleStatement $statement)
     {
-        return (int) round($this->getTotalGlobalDiscount() / $this->getItemsCount());
+        return (int) round($this->getTotalGlobalDiscount($statement) / $this->getItemsCount($statement));
     }
 
     /**
      * Get the subtotal minus the sum of all discounts.
      *
+     * @param \Gerardojbaez\SaleStatements\Models\SaleStatement $statement
      * @return int
      */
-    public function getSubtotalAfterDiscount()
+    public function getSubtotalAfterDiscount(SaleStatement $statement)
     {
-        $subtotal = $this->getSubtotal() - $this->getTotalDiscount();
+        $subtotal = $this->getSubtotal($statement) - $this->getTotalDiscount($statement);
 
         // Return 0 subtotal when discounts are higher than the subtotal amount.
         if ($subtotal < 0) {
@@ -123,13 +112,14 @@ class Calculator implements CalculatorInterface
     /**
      * Get the sum of all tax amounts.
      *
-     * @return void
+     * @param \Gerardojbaez\SaleStatements\Models\SaleStatement $statement
+     * @return int
      */
-    public function getTotalTax()
+    public function getTotalTax(SaleStatement $statement)
     {
         $amount = 0;
 
-        foreach ($this->statement->taxes as $tax) {
+        foreach ($statement->taxes as $tax) {
             $amount += $tax->amount;
         }
 
@@ -139,13 +129,14 @@ class Calculator implements CalculatorInterface
     /**
      * Get the sum of all taxes not associated with any line item.
      *
+     * @param \Gerardojbaez\SaleStatements\Models\SaleStatement $statement
      * @return int
      */
-    public function getTotalGlobalTax()
+    public function getTotalGlobalTax(SaleStatement $statement)
     {
         $amount = 0;
 
-        foreach ($this->statement->taxes as $tax) {
+        foreach ($statement->taxes as $tax) {
             if ($tax->items->count() === 0) {
                 $amount += $tax->amount;
             }
@@ -157,21 +148,23 @@ class Calculator implements CalculatorInterface
     /**
      * Get global tax per item.
      *
+     * @param \Gerardojbaez\SaleStatements\Models\SaleStatement $statement
      * @return int
      */
-    public function getGlobalTaxPerItem()
+    public function getGlobalTaxPerItem(SaleStatement $statement)
     {
-        return (int) round($this->getTotalGlobalTax() / $this->getItemsCount());
+        return (int) round($this->getTotalGlobalTax($statement) / $this->getItemsCount($statement));
     }
 
     /**
      * Get the subtotal, minus discounts, plus taxes.
      *
+     * @param \Gerardojbaez\SaleStatements\Models\SaleStatement $statement
      * @return int
      */
-    public function getTotal()
+    public function getTotal(SaleStatement $statement)
     {
-        return $this->getSubtotalAfterDiscount() + $this->getTotalTax();
+        return $this->getSubtotalAfterDiscount($statement) + $this->getTotalTax($statement);
     }
 
     /**
@@ -183,7 +176,7 @@ class Calculator implements CalculatorInterface
      */
     public function getTotalDiscountsForItem(SaleStatementItem $item)
     {
-        $amount = $this->getGlobalDiscountPerItem() * $item->quantity;
+        $amount = $this->getGlobalDiscountPerItem($item->statement) * $item->quantity;
 
         foreach ($item->discounts as $discount) {
             if ($discount->is_percentage) {
@@ -205,7 +198,7 @@ class Calculator implements CalculatorInterface
      */
     public function getTotalTaxForItem(SaleStatementItem $item)
     {
-        $amount = $this->getGlobalTaxPerItem() * $item->quantity;
+        $amount = $this->getGlobalTaxPerItem($item->statement) * $item->quantity;
 
         foreach ($item->taxes as $tax) {
             $amount += $tax->amount / $tax->items->sum('quantity');
@@ -218,16 +211,17 @@ class Calculator implements CalculatorInterface
      * Get the sum of all payments applied to the sale statement.
      *
      * @todo Add unit tests.
+     * @param \Gerardojbaez\SaleStatements\Models\SaleStatement $statement
      * @return int
      */
-    public function getTotalPaid()
+    public function getTotalPaid(SaleStatement $statement)
     {
-        if ($this->statement->isInvoice()) {
-            $invoice = $this->statement;
-        } elseif ($this->statement->isOrder()) {
-            $invoice = $this->statement->invoice;
-        } elseif ($this->statement->isQuote()) {
-            $invoice = $this->statement->order->invoice;
+        if ($statement->isInvoice()) {
+            $invoice = $statement;
+        } elseif ($statement->isOrder()) {
+            $invoice = $statement->invoice;
+        } elseif ($statement->isQuote()) {
+            $invoice = $statement->order->invoice;
         }
 
         if (! $invoice) {
@@ -241,45 +235,49 @@ class Calculator implements CalculatorInterface
      * Get the remaining balance to be paid.
      *
      * @todo Add unit tests.
+     * @param \Gerardojbaez\SaleStatements\Models\SaleStatement $statement
      * @return int
      */
-    public function getBalance()
+    public function getBalance(SaleStatement $statement)
     {
-        return $this->getTotal() - $this->getTotalPaid();
+        return $this->getTotal($statement) - $this->getTotalPaid($statement);
     }
 
     /**
      * Determines whether the sale statement needs payment.
      *
      * @todo Add unit tests.
+     * @param \Gerardojbaez\SaleStatements\Models\SaleStatement $statement
      * @return boolean
      */
-    public function needsPayment()
+    public function needsPayment(SaleStatement $statement)
     {
-        return $this->getBalance() > 0;
+        return $this->getBalance($statement) > 0;
     }
 
     /**
      * Determines whether the sale statement has a zero balance.
      *
      * @todo Add unit tests.
+     * @param \Gerardojbaez\SaleStatements\Models\SaleStatement $statement
      * @return boolean
      */
-    public function isPaid()
+    public function isPaid(SaleStatement $statement)
     {
-        return $this->getBalance() === 0;
+        return $this->getBalance($statement) === 0;
     }
 
     /**
      * Determines whether the sale statement has partial payments.
      *
      * @todo Add unit tests.
+     * @param \Gerardojbaez\SaleStatements\Models\SaleStatement $statement
      * @return boolean
      */
-    public function isPartiallyPaid()
+    public function isPartiallyPaid(SaleStatement $statement)
     {
-        $totalPaid = $this->getTotalPaid();
+        $totalPaid = $this->getTotalPaid($statement);
 
-        return $totalPaid > 0 and $totalPaid < $this->getTotal();
+        return $totalPaid > 0 and $totalPaid < $this->getTotal($statement);
     }
 }
