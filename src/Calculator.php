@@ -218,13 +218,13 @@ class Calculator implements CalculatorInterface
     {
         if ($statement->isInvoice()) {
             $invoice = $statement;
-        } elseif ($statement->isOrder()) {
+        } elseif ($statement->isOrder() and $statement->invoice) {
             $invoice = $statement->invoice;
-        } elseif ($statement->isQuote()) {
+        } elseif ($statement->isQuote() and $statement->order and $statement->order->invoice) {
             $invoice = $statement->order->invoice;
         }
 
-        if (! $invoice) {
+        if (! isset($invoice)) {
             return 0;
         }
 
