@@ -88,7 +88,11 @@ class Calculator implements CalculatorInterface
      */
     public function getGlobalDiscountPerItem(SaleStatement $statement)
     {
-        return (int) round($this->getTotalGlobalDiscount($statement) / $this->getItemsCount($statement));
+        if (($itemsCount = $this->getItemsCount($statement)) === 0) {
+            return 0;
+        }
+
+        return (int) round($this->getTotalGlobalDiscount($statement) / $itemsCount);
     }
 
     /**
