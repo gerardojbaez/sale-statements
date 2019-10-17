@@ -220,19 +220,33 @@ class Calculator implements CalculatorInterface
      */
     public function getTotalPaid(SaleStatement $statement)
     {
-        if ($statement->isInvoice()) {
-            $invoice = $statement;
-        } elseif ($statement->isOrder() and $statement->invoice) {
-            $invoice = $statement->invoice;
-        } elseif ($statement->isQuote() and $statement->order and $statement->order->invoice) {
-            $invoice = $statement->order->invoice;
+        if ($statement->isInvoice() and $statement->invoice) {
+            return $statement->invoice->payments->sum('amount_applied');
         }
 
-        if (! isset($invoice)) {
-            return 0;
+        if ($statement->isOrder() and $statement->order) {
+            $sum = 0;
+
+            foreach ($statement->order->invoices as $invoice) {
+                $sum += $invoice->payments->sum('amount_applied');
+            }
+
+            return $sum;
         }
 
-        return $invoice->invoice->payments->sum('amount_applied');
+        if ($statement->isQuote() and $statement->quote) {
+            $sum = 0;
+
+            foreach ($statement->quote->orders as $order) {
+                foreach ($order->invoices as $invoice) {
+                    $sum += $invoice->payments->sum('amount_applied');
+                }
+            }
+
+            return $sum;
+        }
+
+        return 0;
     }
 
     /**

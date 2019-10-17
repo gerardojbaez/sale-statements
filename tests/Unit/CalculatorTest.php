@@ -9,7 +9,10 @@ use Gerardojbaez\SaleStatements\Tests\TestCase;
 use Gerardojbaez\SaleStatements\Models\SaleStatement;
 use Gerardojbaez\SaleStatements\Models\SaleStatementTax;
 use Gerardojbaez\SaleStatements\Models\SaleStatementItem;
+use Gerardojbaez\SaleStatements\Models\SaleStatementOrder;
+use Gerardojbaez\SaleStatements\Models\SaleStatementInvoice;
 use Gerardojbaez\SaleStatements\Models\SaleStatementDiscount;
+use Gerardojbaez\SaleStatements\Models\SaleStatementQuote;
 
 class CalculatorTest extends TestCase
 {
@@ -501,6 +504,93 @@ class CalculatorTest extends TestCase
 
         // Assert
         $this->assertSame(211, $result);
+    }
+
+    public function testGetTotalPaidOfInvoice()
+    {
+        // Arrange
+
+        $paymentsMock = Mockery::mock(Collection::class);
+        $paymentsMock->shouldReceive('sum')->with('amount_applied')->andReturn(100);
+
+        $invoiceMock = Mockery::mock(SaleStatementInvoice::class);
+        $invoiceMock->shouldReceive('getAttribute')->with('payments')->andReturn($paymentsMock);
+
+        $statementMock = Mockery::mock(SaleStatement::class);
+        $statementMock->shouldReceive('isInvoice')->andReturn(true);
+        $statementMock->shouldReceive('getAttribute')->with('invoice')->andReturn($invoiceMock);
+
+        $calculator = new Calculator;
+
+        // Act
+        $result = $calculator->getTotalPaid($statementMock);
+
+        // Assert
+        $this->assertSame(100, $result);
+    }
+
+    public function testGetTotalPaidOfOrder()
+    {
+        // Arrange
+
+        $paymentsMock = Mockery::mock(Collection::class);
+        $paymentsMock->shouldReceive('sum')->with('amount_applied')->andReturn(100);
+
+        $invoiceMock = Mockery::mock(SaleStatementInvoice::class);
+        $invoiceMock->shouldReceive('getAttribute')->with('payments')->andReturn($paymentsMock);
+
+        $orderMock = Mockery::mock(SaleStatementOrder::class);
+        $orderMock->shouldReceive('getAttribute')->with('invoices')->andReturn([
+            $invoiceMock, $invoiceMock
+        ]);
+
+        $statementMock = Mockery::mock(SaleStatement::class);
+        $statementMock->shouldReceive('isInvoice')->andReturn(false);
+        $statementMock->shouldReceive('isOrder')->andReturn(true);
+        $statementMock->shouldReceive('getAttribute')->with('order')->andReturn($orderMock);
+
+        $calculator = new Calculator;
+
+        // Act
+        $result = $calculator->getTotalPaid($statementMock);
+
+        // Assert
+        $this->assertSame(200, $result);
+    }
+
+    public function testGetTotalPaidOfQuote()
+    {
+        // Arrange
+
+        $paymentsMock = Mockery::mock(Collection::class);
+        $paymentsMock->shouldReceive('sum')->with('amount_applied')->andReturn(100);
+
+        $invoiceMock = Mockery::mock(SaleStatementInvoice::class);
+        $invoiceMock->shouldReceive('getAttribute')->with('payments')->andReturn($paymentsMock);
+
+        $orderMock = Mockery::mock(SaleStatementOrder::class);
+        $orderMock->shouldReceive('getAttribute')->with('invoices')->andReturn([
+            $invoiceMock, $invoiceMock
+        ]);
+
+        $quoteMock = Mockery::mock(SaleStatementQuote::class);
+        $quoteMock->shouldReceive('getAttribute')->with('orders')->andReturn([
+            $orderMock, $orderMock
+        ]);
+
+        $statementMock = Mockery::mock(SaleStatement::class);
+        $statementMock->shouldReceive('isInvoice')->andReturn(false);
+        $statementMock->shouldReceive('isOrder')->andReturn(false);
+        $statementMock->shouldReceive('isQuote')->andReturn(true);
+        $statementMock->shouldReceive('getAttribute')->with('quote')->andReturn($quoteMock);
+
+        $calculator = new Calculator;
+
+        // Act
+        $result = $calculator->getTotalPaid($statementMock);
+
+        // Assert
+        $this->assertSame(400, $result);
     }
 
     protected function mockItems()
