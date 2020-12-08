@@ -17,7 +17,11 @@ class SaleStatementsServiceProvider extends ServiceProvider
 
         $this->publishes([
             __DIR__.'/../config/sale-statements.php' => config_path('sale-statements.php'),
-        ], 'sale-statements-config');
+        ], 'sale-statements:config');
+
+        $this->publishes([
+            __DIR__.'/../database/migrations/' => database_path('migrations'),
+        ], 'sale-statements:migrations');
     }
 
     /**
