@@ -11,7 +11,7 @@ class Calculator implements CalculatorInterface
     /**
      * Get the sum of all item quantities.
      *
-     * @param \Gerardojbaez\SaleStatements\Models\SaleStatement $statement
+     * @param SaleStatement $statement
      * @return int
      */
     public function getItemsCount(SaleStatement $statement)
@@ -22,7 +22,7 @@ class Calculator implements CalculatorInterface
     /**
      * Get the sum of all item prices without any discount or tax applied.
      *
-     * @param \Gerardojbaez\SaleStatements\Models\SaleStatement $statement
+     * @param SaleStatement $statement
      * @return int
      */
     public function getSubtotal(SaleStatement $statement)
@@ -39,7 +39,7 @@ class Calculator implements CalculatorInterface
     /**
      * Get the sum of all discounts applied.
      *
-     * @param \Gerardojbaez\SaleStatements\Models\SaleStatement $statement
+     * @param SaleStatement $statement
      * @return int
      */
     public function getTotalDiscount(SaleStatement $statement)
@@ -57,7 +57,7 @@ class Calculator implements CalculatorInterface
      * Get the sum of all global discounts (i.e., not associated to any
      * line item).
      *
-     * @param \Gerardojbaez\SaleStatements\Models\SaleStatement $statement
+     * @param SaleStatement $statement
      * @return int
      */
     public function getTotalGlobalDiscount(SaleStatement $statement)
@@ -83,7 +83,7 @@ class Calculator implements CalculatorInterface
     /**
      * Get global discount per item.
      *
-     * @param \Gerardojbaez\SaleStatements\Models\SaleStatement $statement
+     * @param SaleStatement $statement
      * @return int
      */
     public function getGlobalDiscountPerItem(SaleStatement $statement)
@@ -98,7 +98,7 @@ class Calculator implements CalculatorInterface
     /**
      * Get the subtotal minus the sum of all discounts.
      *
-     * @param \Gerardojbaez\SaleStatements\Models\SaleStatement $statement
+     * @param SaleStatement $statement
      * @return int
      */
     public function getSubtotalAfterDiscount(SaleStatement $statement)
@@ -116,7 +116,7 @@ class Calculator implements CalculatorInterface
     /**
      * Get the sum of all tax amounts.
      *
-     * @param \Gerardojbaez\SaleStatements\Models\SaleStatement $statement
+     * @param SaleStatement $statement
      * @return int
      */
     public function getTotalTax(SaleStatement $statement)
@@ -133,7 +133,7 @@ class Calculator implements CalculatorInterface
     /**
      * Get the sum of all taxes not associated with any line item.
      *
-     * @param \Gerardojbaez\SaleStatements\Models\SaleStatement $statement
+     * @param SaleStatement $statement
      * @return int
      */
     public function getTotalGlobalTax(SaleStatement $statement)
@@ -152,7 +152,7 @@ class Calculator implements CalculatorInterface
     /**
      * Get global tax per item.
      *
-     * @param \Gerardojbaez\SaleStatements\Models\SaleStatement $statement
+     * @param SaleStatement $statement
      * @return int
      */
     public function getGlobalTaxPerItem(SaleStatement $statement)
@@ -163,7 +163,7 @@ class Calculator implements CalculatorInterface
     /**
      * Get the subtotal, minus discounts, plus taxes.
      *
-     * @param \Gerardojbaez\SaleStatements\Models\SaleStatement $statement
+     * @param SaleStatement $statement
      * @return int
      */
     public function getTotal(SaleStatement $statement)
@@ -214,21 +214,20 @@ class Calculator implements CalculatorInterface
     /**
      * Get the sum of all payments applied to the sale statement.
      *
-     * @todo Add unit tests.
-     * @param \Gerardojbaez\SaleStatements\Models\SaleStatement $statement
+     * @param SaleStatement $statement
      * @return int
      */
     public function getTotalPaid(SaleStatement $statement)
     {
         if ($statement->isInvoice() and $statement->invoice) {
-            return $statement->invoice->payments->sum('amount_applied');
+            return $statement->invoice->payments->filter->isApplicable()->sum('amount_applied');
         }
 
         if ($statement->isOrder() and $statement->order) {
             $sum = 0;
 
             foreach ($statement->order->invoices as $invoice) {
-                $sum += $invoice->payments->sum('amount_applied');
+                $sum += $invoice->payments->filter->isApplicable()->sum('amount_applied');
             }
 
             return $sum;
@@ -239,7 +238,7 @@ class Calculator implements CalculatorInterface
 
             foreach ($statement->quote->orders as $order) {
                 foreach ($order->invoices as $invoice) {
-                    $sum += $invoice->payments->sum('amount_applied');
+                    $sum += $invoice->payments->filter->isApplicable()->sum('amount_applied');
                 }
             }
 
@@ -252,8 +251,7 @@ class Calculator implements CalculatorInterface
     /**
      * Get the remaining balance to be paid.
      *
-     * @todo Add unit tests.
-     * @param \Gerardojbaez\SaleStatements\Models\SaleStatement $statement
+     * @param SaleStatement $statement
      * @return int
      */
     public function getBalance(SaleStatement $statement)
@@ -264,9 +262,9 @@ class Calculator implements CalculatorInterface
     /**
      * Determines whether the sale statement needs payment.
      *
-     * @todo Add unit tests.
-     * @param \Gerardojbaez\SaleStatements\Models\SaleStatement $statement
+     * @param SaleStatement $statement
      * @return boolean
+     *@todo Add unit tests.
      */
     public function needsPayment(SaleStatement $statement)
     {
@@ -276,8 +274,7 @@ class Calculator implements CalculatorInterface
     /**
      * Determines whether the sale statement has a zero balance.
      *
-     * @todo Add unit tests.
-     * @param \Gerardojbaez\SaleStatements\Models\SaleStatement $statement
+     * @param SaleStatement $statement
      * @return boolean
      */
     public function isPaid(SaleStatement $statement)
@@ -288,8 +285,7 @@ class Calculator implements CalculatorInterface
     /**
      * Determines whether the sale statement has partial payments.
      *
-     * @todo Add unit tests.
-     * @param \Gerardojbaez\SaleStatements\Models\SaleStatement $statement
+     * @param SaleStatement $statement
      * @return boolean
      */
     public function isPartiallyPaid(SaleStatement $statement)

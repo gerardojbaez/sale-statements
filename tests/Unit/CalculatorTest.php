@@ -512,6 +512,8 @@ class CalculatorTest extends TestCase
 
         $paymentsMock = Mockery::mock(Collection::class);
         $paymentsMock->shouldReceive('sum')->with('amount_applied')->andReturn(100);
+        $paymentsMock->shouldReceive('filter')->andReturnSelf();
+        $paymentsMock->shouldReceive('isApplicable')->andReturnSelf();
 
         $invoiceMock = Mockery::mock(SaleStatementInvoice::class);
         $invoiceMock->shouldReceive('getAttribute')->with('payments')->andReturn($paymentsMock);
@@ -535,6 +537,8 @@ class CalculatorTest extends TestCase
 
         $paymentsMock = Mockery::mock(Collection::class);
         $paymentsMock->shouldReceive('sum')->with('amount_applied')->andReturn(100);
+        $paymentsMock->shouldReceive('filter')->andReturnSelf();
+        $paymentsMock->shouldReceive('isApplicable')->andReturnSelf();
 
         $invoiceMock = Mockery::mock(SaleStatementInvoice::class);
         $invoiceMock->shouldReceive('getAttribute')->with('payments')->andReturn($paymentsMock);
@@ -564,6 +568,8 @@ class CalculatorTest extends TestCase
 
         $paymentsMock = Mockery::mock(Collection::class);
         $paymentsMock->shouldReceive('sum')->with('amount_applied')->andReturn(100);
+        $paymentsMock->shouldReceive('filter')->andReturnSelf();
+        $paymentsMock->shouldReceive('isApplicable')->andReturnSelf();
 
         $invoiceMock = Mockery::mock(SaleStatementInvoice::class);
         $invoiceMock->shouldReceive('getAttribute')->with('payments')->andReturn($paymentsMock);

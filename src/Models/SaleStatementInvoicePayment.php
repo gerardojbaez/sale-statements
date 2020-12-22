@@ -23,4 +23,16 @@ class SaleStatementInvoicePayment extends Model
             'sale_statement_invoice_id'
         );
     }
+
+    /**
+     * Determine whether the payment is applicable to the invoice.
+     *
+     * Best use case for this would be for failed, pending, and successful payments where successful payments.
+     *
+     * @return bool
+     */
+    public function isApplicable()
+    {
+        return true; // replace with your own logic
+    }
 }
