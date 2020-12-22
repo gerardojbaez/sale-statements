@@ -29,9 +29,7 @@
         <log type="testdox-html" target="./log/testdox.html" />
     </logging>
     <php>
-        <env name="DB_CONNECTION" value="mysql"/>
-        <env name="DB_DATABASE" value="sale_statements_testing"/>
-        <env name="DB_USERNAME" value="sale_statements_testing"/>
-        <env name="DB_PASSWORD" value="sale_statements_testing"/>
+        <env name="DB_CONNECTION" value="sqlite"/>
+        <env name="DB_DATABASE" value=":memory:"/>
     </php>
 </phpunit>
