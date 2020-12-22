@@ -2,11 +2,14 @@
 
 namespace Gerardojbaez\SaleStatements\Tests\Feature\Console;
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Gerardojbaez\SaleStatements\Tests\TestCase;
 
 class InsertSaleStatementTypesTest extends TestCase
 {
+    use RefreshDatabase;
+
     /**
      * Insert sale statement types.
      *
