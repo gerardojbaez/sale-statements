@@ -27,7 +27,8 @@ class SaleStatementInvoicePayment extends Model
     /**
      * Determine whether the payment is applicable to the invoice.
      *
-     * Best use case for this would be for failed, pending, and successful payments where successful payments.
+     * The most common use case would be to filter out successful/completed payments, leaving out any failed, pending,
+     * or authorized payments.
      *
      * @return bool
      */
