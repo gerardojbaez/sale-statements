@@ -14,7 +14,7 @@ class CreateSaleStatementQuoteTable extends Migration
     public function up()
     {
         Schema::create('sale_statement_quote', function (Blueprint $table) {
-            $table->integer('id')->unsigned();
+            $table->integer('id')->unsigned()->primary();
 
             $table->foreign('id')
                 ->references('id')

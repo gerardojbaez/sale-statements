@@ -14,7 +14,7 @@ class CreateSaleStatementCreditMemoTable extends Migration
     public function up()
     {
         Schema::create('sale_statement_credit_memo', function (Blueprint $table) {
-            $table->integer('id')->unsigned();
+            $table->integer('id')->unsigned()->primary();
 
             $table->foreign('id')
                 ->references('id')

@@ -14,7 +14,7 @@ class CreateSaleStatementOrderTable extends Migration
     public function up()
     {
         Schema::create('sale_statement_order', function (Blueprint $table) {
-            $table->integer('id')->unsigned();
+            $table->integer('id')->unsigned()->primary();
             $table->integer('sale_statement_quote_id')->unsigned()->nullable();
 
             $table->foreign('id')
@@ -25,7 +25,7 @@ class CreateSaleStatementOrderTable extends Migration
             $table->foreign('sale_statement_quote_id')
                 ->references('id')
                 ->on('sale_statement_quote')
-                ->onDelete('set null');
+                ->nullOnDelete();
         });
     }
 

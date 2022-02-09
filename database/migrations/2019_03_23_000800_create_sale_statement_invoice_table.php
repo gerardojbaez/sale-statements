@@ -14,7 +14,7 @@ class CreateSaleStatementInvoiceTable extends Migration
     public function up()
     {
         Schema::create('sale_statement_invoice', function (Blueprint $table) {
-            $table->integer('id')->unsigned();
+            $table->integer('id')->unsigned()->primary();
             $table->integer('sale_statement_order_id')->unsigned()->nullable();
 
             $table->foreign('id')
