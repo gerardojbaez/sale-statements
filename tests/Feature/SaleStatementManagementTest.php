@@ -14,52 +14,20 @@ class SaleStatementManagementTest extends TestCase
 {
     use RefreshDatabase;
 
-    /**
-     * Create quote type sale statement.
-     *
-     * @return void
-     */
-    public function testCreateQuoteTypeSaleStatement()
+    /** @dataProvider provides_sale_statement_types */
+    public function test_create_sale_statement($type)
     {
         // Arrange
-        SaleStatementType::create([
-            'code' => 'quote',
-            'name' => 'Quote',
-        ]);
+        SaleStatementType::query()->create(['code' => $type, 'name' => $type]);
 
         // Act
-        list($statement, $items, $taxes, $discounts) = $this->createSaleStatement('quote');
+        list($statement, $items, $taxes, $discounts) = $this->createSaleStatement($type);
 
         // Assert
-        $this->assertSaleStatementWasCreated($statement,  $items, $taxes, 'quote', $discounts);
+        $this->assertSaleStatementWasCreated($statement,  $items, $taxes, $type, $discounts);
     }
 
-    /**
-     * Create order type sale statement.
-     *
-     * @return void
-     */
-    public function testCreateOrderTypeSaleStatement()
-    {
-        // Arrange
-        SaleStatementType::create([
-            'code' => 'order',
-            'name' => 'Order',
-        ]);
-
-        // Act
-        list($statement, $items, $taxes, $discounts) = $this->createSaleStatement('order');
-
-        // Assert
-        $this->assertSaleStatementWasCreated($statement, $items, $taxes, 'order', $discounts);
-    }
-
-    /**
-     * Create invoice type sale statement.
-     *
-     * @return void
-     */
-    public function testCreateInvoiceTypeSaleStatement()
+    public function test_create_invoice_with_payments()
     {
         // Arrange
         SaleStatementType::create([
@@ -70,13 +38,8 @@ class SaleStatementManagementTest extends TestCase
         // Act
         list($statement, $items, $taxes, $discounts) = $this->createSaleStatement('invoice');
 
-        $payment = $statement->invoice->payments()->create([
-            'amount_applied' => 5000
-        ]);
-
-        $statement->invoice->payments()->create([
-            'amount_applied' => 10000
-        ]);
+        $payment = $statement->invoice->payments()->create(['amount_applied' => 5000]);
+        $statement->invoice->payments()->create(['amount_applied' => 10000]);
 
         $calculator = new Calculator;
 
@@ -101,32 +64,7 @@ class SaleStatementManagementTest extends TestCase
         $this->assertTrue($calculator->isPartiallyPaid($statement));
     }
 
-    /**
-     * Create credit memo type sale statement.
-     *
-     * @return void
-     */
-    public function testCreateCreditMemoTypeSaleStatement()
-    {
-        // Arrange
-        SaleStatementType::create([
-            'code' => 'credit_memo',
-            'name' => 'Credit Memo',
-        ]);
-
-        // Act
-        list($statement, $items, $taxes, $discounts) = $this->createSaleStatement('credit_memo');
-
-        // Assert
-        $this->assertSaleStatementWasCreated($statement, $items, $taxes, 'credit_memo', $discounts);
-    }
-
-    /**
-     * Generate order from quote. Order must be identical.
-     *
-     * @return void
-     */
-    public function testCreateOrderFromQuote()
+    public function test_create_order_from_quote()
     {
         // Arrange
         SaleStatementType::create([
@@ -167,12 +105,7 @@ class SaleStatementManagementTest extends TestCase
         ]);
     }
 
-    /**
-     * Generate invoice from order. Invoice must be identical.
-     *
-     * @return void
-     */
-    public function testCreateInvoiceFromOrder()
+    public function test_create_invoice_from_order()
     {
         // Arrange
         SaleStatementType::create([
@@ -213,13 +146,7 @@ class SaleStatementManagementTest extends TestCase
         ]);
     }
 
-    /**
-     * Create sale statement.
-     *
-     * @param string $type
-     * @return \Gerardojbaez\SaleStatements\Models\SaleStatement
-     */
-    protected function createSaleStatement($type)
+    protected function createSaleStatement($type): array
     {
         $statement = SaleStatement::create($type);
 
@@ -229,7 +156,7 @@ class SaleStatementManagementTest extends TestCase
             'line_1' => '711-2880 Nulla St',
             'line_2' => 'second line...',
             'locality' => 'Mankato', // City, Town, Municipality, etc...
-            'administrative_area' => 'Mississipi', // State, Province, Region, etc...
+            'administrative_area' => 'Mississippi', // State, Province, Region, etc...
             'country_code' => 'US',
             'postalcode' => 96522,
             'given_name' => 'Cecilia', // i.e., first name
@@ -291,13 +218,6 @@ class SaleStatementManagementTest extends TestCase
         return [$statement, $items, $taxes, $discounts];
     }
 
-    /**
-     * Assert the sale statement was created.
-     *
-     * @param \Gerardojbaez\SaleStatements\Models\SaleStatement $statement
-     * @param string $type
-     * @return void
-     */
     protected function assertSaleStatementWasCreated($statement, $items, $taxes, $type, $discounts)
     {
         $this->assertDatabaseHas('sale_statements', [
@@ -316,7 +236,7 @@ class SaleStatementManagementTest extends TestCase
             'line_1' => '711-2880 Nulla St',
             'line_2' => 'second line...',
             'locality' => 'Mankato',
-            'administrative_area' => 'Mississipi',
+            'administrative_area' => 'Mississippi',
             'country_code' => 'US',
             'postalcode' => 96522,
             'given_name' => 'Cecilia',
@@ -407,5 +327,15 @@ class SaleStatementManagementTest extends TestCase
         $this->assertEquals(275, $calculator->getTotalGlobalTax($statement));
         $this->assertEquals(92, $calculator->getGlobalTaxPerItem($statement));
         $this->assertEquals(30737, $calculator->getTotal($statement));
+    }
+
+    public function provides_sale_statement_types(): array
+    {
+        return [
+            'Quote' => [SaleStatementType::TYPE_QUOTE],
+            'Order' => [SaleStatementType::TYPE_ORDER],
+            'Invoice' => [SaleStatementType::TYPE_INVOICE],
+            'Credit Memo' => [SaleStatementType::TYPE_CREDIT_MEMO],
+        ];
     }
 }
